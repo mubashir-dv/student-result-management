@@ -1,122 +1,177 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [student, setStudent] = useState({
+    name: "",
+    rollNo: "",
+    studentClass: "",
+    studentId: "",
+  });
+
+  const [students, setStudents] = useState(() => {
+    const savedStudents = localStorage.getItem("students");
+
+    return savedStudents ? JSON.parse(savedStudents) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("students", JSON.stringify(students));
+  }, [students]);
+
+  const handleChange = (e) => {
+    setStudent({
+      ...student,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (
+      !student.name ||
+      !student.rollNo ||
+      !student.studentClass ||
+      !student.studentId
+    ) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    const newStudent = {
+      ...student,
+      id: Date.now(),
+    };
+
+    setStudents([...students, newStudent]);
+
+    setStudent({
+      name: "",
+      rollNo: "",
+      studentClass: "",
+      studentId: "",
+    });
+  };
+
+  const deleteStudent = (id) => {
+    setStudents(students.filter((student) => student.id !== id));
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      <header className="header">
+        <h1>Student Result Management System</h1>
+        <p>Manage student records and academic results</p>
+      </header>
 
-      <div className="ticks"></div>
+      <main className="container">
+        <section className="form-card">
+          <h2>Add New Student</h2>
+          <p>Enter student information below.</p>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <form onSubmit={handleSubmit}>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Student Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={student.name}
+                  onChange={handleChange}
+                  placeholder="Enter student name"
+                />
+              </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+              <div className="form-group">
+                <label>Roll Number</label>
+                <input
+                  type="text"
+                  name="rollNo"
+                  value={student.rollNo}
+                  onChange={handleChange}
+                  placeholder="Enter roll number"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Class</label>
+                <input
+                  type="text"
+                  name="studentClass"
+                  value={student.studentClass}
+                  onChange={handleChange}
+                  placeholder="Enter class"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Student ID</label>
+                <input
+                  type="text"
+                  name="studentId"
+                  value={student.studentId}
+                  onChange={handleChange}
+                  placeholder="Enter student ID"
+                />
+              </div>
+            </div>
+
+            <button type="submit">Add Student</button>
+          </form>
+        </section>
+
+        <section className="students-section">
+          <div className="section-header">
+            <h2>Student Records</h2>
+            <span>{students.length} Students</span>
+          </div>
+
+          {students.length === 0 ? (
+            <div className="empty-state">
+              <p>No students added yet.</p>
+              <span>Add a student using the form above.</span>
+            </div>
+          ) : (
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Class</th>
+                    <th>Student ID</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {students.map((item, index) => (
+                    <tr key={item.id}>
+                      <td>{index + 1}</td>
+                      <td>{item.name}</td>
+                      <td>{item.rollNo}</td>
+                      <td>{item.studentClass}</td>
+                      <td>{item.studentId}</td>
+                      <td>
+                        <button
+                          className="delete-btn"
+                          onClick={() => deleteStudent(item.id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
