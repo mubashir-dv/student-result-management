@@ -227,3 +227,19 @@ td {
     padding: 20px;
   }
 }
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #2563eb;
+}

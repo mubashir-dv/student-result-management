@@ -15,6 +15,8 @@ function App() {
     return savedStudents ? JSON.parse(savedStudents) : [];
   });
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     localStorage.setItem("students", JSON.stringify(students));
   }, [students]);
@@ -58,6 +60,12 @@ function App() {
     setStudents(students.filter((student) => student.id !== id));
   };
 
+  const filteredStudents = students.filter(
+    (student) =>
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.rollNo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div>
       <header className="header">
@@ -66,6 +74,7 @@ function App() {
       </header>
 
       <main className="container">
+        {/* Add Student Form */}
         <section className="form-card">
           <h2>Add New Student</h2>
           <p>Enter student information below.</p>
@@ -121,16 +130,32 @@ function App() {
           </form>
         </section>
 
+        {/* Student List */}
         <section className="students-section">
           <div className="section-header">
             <h2>Student Records</h2>
             <span>{students.length} Students</span>
           </div>
 
+          {/* Search */}
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search by student name or roll number..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
           {students.length === 0 ? (
             <div className="empty-state">
               <p>No students added yet.</p>
               <span>Add a student using the form above.</span>
+            </div>
+          ) : filteredStudents.length === 0 ? (
+            <div className="empty-state">
+              <p>No matching student found.</p>
+              <span>Try another name or roll number.</span>
             </div>
           ) : (
             <div className="table-container">
@@ -147,7 +172,7 @@ function App() {
                 </thead>
 
                 <tbody>
-                  {students.map((item, index) => (
+                  {filteredStudents.map((item, index) => (
                     <tr key={item.id}>
                       <td>{index + 1}</td>
                       <td>{item.name}</td>
