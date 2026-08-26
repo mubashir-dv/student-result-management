@@ -16,6 +16,7 @@ function App() {
   });
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("students", JSON.stringify(students));
@@ -41,12 +42,57 @@ function App() {
       return;
     }
 
-    const newStudent = {
-      ...student,
-      id: Date.now(),
-    };
+    if (editingId !== null) {
+      setStudents(
+        students.map((item) =>
+          item.id === editingId
+            ? { ...student, id: editingId }
+            : item
+        )
+      );
 
-    setStudents([...students, newStudent]);
+      setEditingId(null);
+    } else {
+      const newStudent = {
+        ...student,
+        id: Date.now(),
+      };
+
+      setStudents([...students, newStudent]);
+    }
+
+    setStudent({
+      name: "",
+      rollNo: "",
+      studentClass: "",
+      studentId: "",
+    });
+  };
+
+  const editStudent = (id) => {
+    const selectedStudent = students.find(
+      (item) => item.id === id
+    );
+
+    if (selectedStudent) {
+      setStudent({
+        name: selectedStudent.name,
+        rollNo: selectedStudent.rollNo,
+        studentClass: selectedStudent.studentClass,
+        studentId: selectedStudent.studentId,
+      });
+
+      setEditingId(id);
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
 
     setStudent({
       name: "",
@@ -57,13 +103,19 @@ function App() {
   };
 
   const deleteStudent = (id) => {
-    setStudents(students.filter((student) => student.id !== id));
+    setStudents(
+      students.filter((student) => student.id !== id)
+    );
   };
 
   const filteredStudents = students.filter(
     (student) =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.rollNo.toLowerCase().includes(searchTerm.toLowerCase())
+      student.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      student.rollNo
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -74,15 +126,27 @@ function App() {
       </header>
 
       <main className="container">
-        {/* Add Student Form */}
+
+        {/* Add / Edit Student Form */}
         <section className="form-card">
-          <h2>Add New Student</h2>
-          <p>Enter student information below.</p>
+          <h2>
+            {editingId !== null
+              ? "Edit Student"
+              : "Add New Student"}
+          </h2>
+
+          <p>
+            {editingId !== null
+              ? "Update student information below."
+              : "Enter student information below."}
+          </p>
 
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
+
               <div className="form-group">
                 <label>Student Name</label>
+
                 <input
                   type="text"
                   name="name"
@@ -94,6 +158,7 @@ function App() {
 
               <div className="form-group">
                 <label>Roll Number</label>
+
                 <input
                   type="text"
                   name="rollNo"
@@ -105,6 +170,7 @@ function App() {
 
               <div className="form-group">
                 <label>Class</label>
+
                 <input
                   type="text"
                   name="studentClass"
@@ -116,6 +182,7 @@ function App() {
 
               <div className="form-group">
                 <label>Student ID</label>
+
                 <input
                   type="text"
                   name="studentId"
@@ -124,14 +191,30 @@ function App() {
                   placeholder="Enter student ID"
                 />
               </div>
+
             </div>
 
-            <button type="submit">Add Student</button>
+            <button type="submit">
+              {editingId !== null
+                ? "Update Student"
+                : "Add Student"}
+            </button>
+
+            {editingId !== null && (
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={cancelEdit}
+              >
+                Cancel
+              </button>
+            )}
           </form>
         </section>
 
-        {/* Student List */}
+        {/* Student Records */}
         <section className="students-section">
+
           <div className="section-header">
             <h2>Student Records</h2>
             <span>{students.length} Students</span>
@@ -143,22 +226,29 @@ function App() {
               type="text"
               placeholder="Search by student name or roll number..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) =>
+                setSearchTerm(e.target.value)
+              }
             />
           </div>
 
           {students.length === 0 ? (
             <div className="empty-state">
               <p>No students added yet.</p>
-              <span>Add a student using the form above.</span>
+              <span>
+                Add a student using the form above.
+              </span>
             </div>
           ) : filteredStudents.length === 0 ? (
             <div className="empty-state">
               <p>No matching student found.</p>
-              <span>Try another name or roll number.</span>
+              <span>
+                Try another name or roll number.
+              </span>
             </div>
           ) : (
             <div className="table-container">
+
               <table>
                 <thead>
                   <tr>
@@ -172,28 +262,48 @@ function App() {
                 </thead>
 
                 <tbody>
-                  {filteredStudents.map((item, index) => (
-                    <tr key={item.id}>
-                      <td>{index + 1}</td>
-                      <td>{item.name}</td>
-                      <td>{item.rollNo}</td>
-                      <td>{item.studentClass}</td>
-                      <td>{item.studentId}</td>
-                      <td>
-                        <button
-                          className="delete-btn"
-                          onClick={() => deleteStudent(item.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredStudents.map(
+                    (item, index) => (
+                      <tr key={item.id}>
+                        <td>{index + 1}</td>
+
+                        <td>{item.name}</td>
+
+                        <td>{item.rollNo}</td>
+
+                        <td>{item.studentClass}</td>
+
+                        <td>{item.studentId}</td>
+
+                        <td>
+                          <button
+                            className="edit-btn"
+                            onClick={() =>
+                              editStudent(item.id)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="delete-btn"
+                            onClick={() =>
+                              deleteStudent(item.id)
+                            }
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
+
             </div>
           )}
         </section>
+
       </main>
     </div>
   );
