@@ -17,6 +17,7 @@ function App() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const [viewingStudent, setViewingStudent] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("students", JSON.stringify(students));
@@ -91,6 +92,18 @@ function App() {
     }
   };
 
+  const viewStudent = (id) => {
+    const selectedStudent = students.find(
+      (item) => item.id === id
+    );
+
+    setViewingStudent(selectedStudent);
+  };
+
+  const closeStudentDetails = () => {
+    setViewingStudent(null);
+  };
+
   const cancelEdit = () => {
     setEditingId(null);
 
@@ -106,6 +119,10 @@ function App() {
     setStudents(
       students.filter((student) => student.id !== id)
     );
+
+    if (viewingStudent?.id === id) {
+      setViewingStudent(null);
+    }
   };
 
   const filteredStudents = students.filter(
@@ -277,6 +294,15 @@ function App() {
 
                         <td>
                           <button
+                            className="view-btn"
+                            onClick={() =>
+                              viewStudent(item.id)
+                            }
+                          >
+                            View
+                          </button>
+
+                          <button
                             className="edit-btn"
                             onClick={() =>
                               editStudent(item.id)
@@ -303,6 +329,44 @@ function App() {
             </div>
           )}
         </section>
+
+        {/* Student Details */}
+        {viewingStudent && (
+          <section className="details-card">
+            <div className="details-header">
+              <h2>Student Details</h2>
+
+              <button
+                className="close-btn"
+                onClick={closeStudentDetails}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="details-grid">
+              <div>
+                <span>Student Name</span>
+                <strong>{viewingStudent.name}</strong>
+              </div>
+
+              <div>
+                <span>Roll Number</span>
+                <strong>{viewingStudent.rollNo}</strong>
+              </div>
+
+              <div>
+                <span>Class</span>
+                <strong>{viewingStudent.studentClass}</strong>
+              </div>
+
+              <div>
+                <span>Student ID</span>
+                <strong>{viewingStudent.studentId}</strong>
+              </div>
+            </div>
+          </section>
+        )}
 
       </main>
     </div>
