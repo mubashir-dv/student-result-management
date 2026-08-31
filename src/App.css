@@ -6,50 +6,59 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: #f5f7fa;
-  color: #1f2937;
+  background: #f4f6f9;
+  color: #1e293b;
+}
+
+button,
+input {
+  font-family: inherit;
 }
 
 .header {
-  background: #2563eb;
+  background: #1e293b;
   color: white;
-  padding: 30px 20px;
   text-align: center;
+  padding: 35px 20px;
 }
 
 .header h1 {
-  font-size: 28px;
+  font-size: 30px;
   margin-bottom: 8px;
 }
 
 .header p {
-  font-size: 16px;
+  color: #cbd5e1;
+  font-size: 15px;
 }
 
 .container {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 20px;
+  width: 92%;
+  max-width: 1200px;
+  margin: 35px auto;
 }
 
-/* Student Form */
-
-.form-card {
+.form-card,
+.students-section,
+.details-card {
   background: white;
-  padding: 30px;
   border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 30px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-.form-card h2 {
-  color: #1f2937;
-  font-size: 24px;
+.form-card h2,
+.students-section h2,
+.details-card h2 {
+  font-size: 22px;
   margin-bottom: 8px;
+  color: #1e293b;
 }
 
-.form-card p {
+.form-card > p {
+  color: #64748b;
   margin-bottom: 25px;
-  color: #6b7280;
 }
 
 .form-grid {
@@ -65,220 +74,190 @@ body {
 }
 
 .form-group label {
-  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
   margin-bottom: 8px;
-  font-weight: bold;
+  color: #334155;
 }
 
 .form-group input {
   width: 100%;
-  padding: 12px;
-  background-color: white;
-  color: #1f2937;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 15px;
+  padding: 12px 14px;
+  background: white;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  outline: none;
+  font-size: 14px;
 }
 
 .form-group input::placeholder {
-  color: #9ca3af;
+  color: #94a3b8;
 }
 
 .form-group input:focus {
-  outline: none;
   border-color: #2563eb;
-  background-color: white;
-  color: #1f2937;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-button {
+.form-card form > button {
+  padding: 12px 22px;
   border: none;
+  border-radius: 7px;
   background: #2563eb;
   color: white;
-  padding: 12px 20px;
-  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 15px;
 }
 
-button:hover {
+.form-card form > button:hover {
   background: #1d4ed8;
 }
 
-/* Student Records */
+.form-card form .cancel-btn {
+  margin-left: 10px;
+  background: #64748b;
+}
 
-.students-section {
-  background: white;
-  margin-top: 30px;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+.form-card form .cancel-btn:hover {
+  background: #475569;
 }
 
 .section-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.section-header h2 {
-  color: #1f2937;
-  margin: 0;
-}
-
 .section-header span {
-  background: #e0e7ff;
+  background: #e0ecff;
   color: #2563eb;
-  padding: 6px 12px;
+  padding: 7px 13px;
   border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  background: #f9fafb;
-  border-radius: 8px;
-}
-
-.empty-state p {
-  font-size: 17px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #1f2937;
-}
-
-.empty-state span {
-  color: #6b7280;
-}
-
-/* Student Table */
-
-.table-container {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 14px 12px;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th {
-  background: #f3f4f6;
-  color: #1f2937;
-  font-size: 14px;
-}
-
-td {
-  color: #1f2937;
-  font-size: 14px;
-}
-
-/* Delete Button */
-
-.delete-btn {
-  background: #dc2626;
-  padding: 8px 12px;
   font-size: 13px;
+  font-weight: 600;
 }
 
-.delete-btn:hover {
-  background: #b91c1c;
-}
-
-/* Mobile Responsive */
-
-@media (max-width: 700px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .section-header {
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  th,
-  td {
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 600px) {
-  .header h1 {
-    font-size: 22px;
-  }
-
-  .container {
-    margin: 25px auto;
-  }
-
-  .form-card,
-  .students-section {
-    padding: 20px;
-  }
-}
 .search-box {
   margin-bottom: 20px;
 }
 
 .search-box input {
   width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 15px;
+  padding: 13px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: white;
+  color: #1e293b;
+  outline: none;
+  font-size: 14px;
 }
 
 .search-box input:focus {
-  outline: none;
   border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
-.edit-btn {
-  background: #2563eb;
-  margin-right: 8px;
-  padding: 8px 12px;
+
+.search-box input::placeholder {
+  color: #94a3b8;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+thead {
+  background: #1e293b;
+  color: white;
+}
+
+th {
+  padding: 14px 12px;
+  text-align: left;
   font-size: 13px;
+  font-weight: 600;
 }
 
-.edit-btn:hover {
-  background: #1d4ed8;
+td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+  color: #334155;
 }
 
-.cancel-btn {
-  background: #6b7280;
-  margin-left: 10px;
+tbody tr:hover {
+  background: #f8fafc;
 }
 
-.cancel-btn:hover {
-  background: #4b5563;
+.view-btn,
+.edit-btn,
+.delete-btn {
+  border: none;
+  padding: 7px 11px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-right: 6px;
 }
+
 .view-btn {
-  background: #16a34a;
-  margin-right: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
+  background: #0ea5e9;
+  color: white;
 }
 
 .view-btn:hover {
-  background: #15803d;
+  background: #0284c7;
+}
+
+.edit-btn {
+  background: #f59e0b;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #d97706;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 45px 20px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.empty-state p {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 7px;
+}
+
+.empty-state span {
+  font-size: 14px;
+  color: #94a3b8;
 }
 
 .details-card {
-  background: white;
-  margin-top: 30px;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  position: relative;
 }
 
 .details-header {
@@ -288,18 +267,20 @@ td {
   margin-bottom: 25px;
 }
 
-.details-header h2 {
-  margin: 0;
-}
-
 .close-btn {
-  background: #6b7280;
-  font-size: 22px;
-  padding: 4px 12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: #ef4444;
+  color: white;
+  font-size: 23px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .close-btn:hover {
-  background: #4b5563;
+  background: #dc2626;
 }
 
 .details-grid {
@@ -309,25 +290,98 @@ td {
 }
 
 .details-grid div {
-  background: #f9fafb;
-  padding: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  padding: 18px;
 }
 
 .details-grid span {
   display: block;
-  color: #6b7280;
-  font-size: 14px;
-  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 7px;
 }
 
 .details-grid strong {
+  display: block;
+  color: #1e293b;
   font-size: 16px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .header {
+    padding: 28px 15px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .container {
+    width: 94%;
+    margin: 25px auto;
+  }
+
+  .form-card,
+  .students-section,
+  .details-card {
+    padding: 20px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
   .details-grid {
     grid-template-columns: 1fr;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .section-header h2 {
+    font-size: 19px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 21px;
+  }
+
+  .header p {
+    font-size: 13px;
+  }
+
+  .form-card,
+  .students-section,
+  .details-card {
+    padding: 16px;
+  }
+
+  .form-card form > button {
+    width: 100%;
+  }
+
+  .form-card form .cancel-btn {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .section-header {
+    flex-direction: column;
+  }
+
+  .section-header span {
+    align-self: flex-start;
+  }
+
+  .view-btn,
+  .edit-btn,
+  .delete-btn {
+    margin-bottom: 5px;
   }
 }

@@ -2,375 +2,382 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
-  const [student, setStudent] = useState({
-    name: "",
-    rollNo: "",
-    studentClass: "",
-    studentId: "",
-  });
+const [student, setStudent] = useState({
+name: "",
+rollNo: "",
+studentClass: "",
+studentId: "",
+});
 
-  const [students, setStudents] = useState(() => {
-    const savedStudents = localStorage.getItem("students");
+const [students, setStudents] = useState(() => {
+const savedStudents = localStorage.getItem("students");
 
-    return savedStudents ? JSON.parse(savedStudents) : [];
-  });
+return savedStudents ? JSON.parse(savedStudents) : [];
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editingId, setEditingId] = useState(null);
-  const [viewingStudent, setViewingStudent] = useState(null);
+});
 
-  useEffect(() => {
-    localStorage.setItem("students", JSON.stringify(students));
-  }, [students]);
+const [searchTerm, setSearchTerm] = useState("");
+const [editingId, setEditingId] = useState(null);
+const [viewingStudent, setViewingStudent] = useState(null);
 
-  const handleChange = (e) => {
-    setStudent({
-      ...student,
-      [e.target.name]: e.target.value,
-    });
-  };
+useEffect(() => {
+localStorage.setItem("students", JSON.stringify(students));
+}, [students]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleChange = (e) => {
+setStudent({
+...student,
+[e.target.name]: e.target.value,
+});
+};
 
-    if (
-      !student.name ||
-      !student.rollNo ||
-      !student.studentClass ||
-      !student.studentId
-    ) {
-      alert("Please fill all fields.");
-      return;
-    }
+const handleSubmit = (e) => {
+e.preventDefault();
 
-    if (editingId !== null) {
-      setStudents(
-        students.map((item) =>
-          item.id === editingId
-            ? { ...student, id: editingId }
-            : item
-        )
-      );
+if (  
+  !student.name ||  
+  !student.rollNo ||  
+  !student.studentClass ||  
+  !student.studentId  
+) {  
+  alert("Please fill all fields.");  
+  return;  
+}  
 
-      setEditingId(null);
-    } else {
-      const newStudent = {
-        ...student,
-        id: Date.now(),
-      };
+if (editingId !== null) {  
+  setStudents(  
+    students.map((item) =>  
+      item.id === editingId  
+        ? { ...student, id: editingId }  
+        : item  
+    )  
+  );  
 
-      setStudents([...students, newStudent]);
-    }
+  setEditingId(null);  
+} else {  
+  const newStudent = {  
+    ...student,  
+    id: Date.now(),  
+  };  
 
-    setStudent({
-      name: "",
-      rollNo: "",
-      studentClass: "",
-      studentId: "",
-    });
-  };
+  setStudents([...students, newStudent]);  
+}  
 
-  const editStudent = (id) => {
-    const selectedStudent = students.find(
-      (item) => item.id === id
-    );
+setStudent({  
+  name: "",  
+  rollNo: "",  
+  studentClass: "",  
+  studentId: "",  
+});
 
-    if (selectedStudent) {
-      setStudent({
-        name: selectedStudent.name,
-        rollNo: selectedStudent.rollNo,
-        studentClass: selectedStudent.studentClass,
-        studentId: selectedStudent.studentId,
-      });
+};
 
-      setEditingId(id);
+const editStudent = (id) => {
+const selectedStudent = students.find(
+(item) => item.id === id
+);
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
-  };
+if (selectedStudent) {  
+  setStudent({  
+    name: selectedStudent.name,  
+    rollNo: selectedStudent.rollNo,  
+    studentClass: selectedStudent.studentClass,  
+    studentId: selectedStudent.studentId,  
+  });  
 
-  const viewStudent = (id) => {
-    const selectedStudent = students.find(
-      (item) => item.id === id
-    );
+  setEditingId(id);  
 
-    setViewingStudent(selectedStudent);
-  };
+  window.scrollTo({  
+    top: 0,  
+    behavior: "smooth",  
+  });  
+}
 
-  const closeStudentDetails = () => {
-    setViewingStudent(null);
-  };
+};
 
-  const cancelEdit = () => {
-    setEditingId(null);
+const viewStudent = (id) => {
+const selectedStudent = students.find(
+(item) => item.id === id
+);
 
-    setStudent({
-      name: "",
-      rollNo: "",
-      studentClass: "",
-      studentId: "",
-    });
-  };
+setViewingStudent(selectedStudent);
 
-  const deleteStudent = (id) => {
-    setStudents(
-      students.filter((student) => student.id !== id)
-    );
+};
 
-    if (viewingStudent?.id === id) {
-      setViewingStudent(null);
-    }
-  };
+const closeStudentDetails = () => {
+setViewingStudent(null);
+};
 
-  const filteredStudents = students.filter(
-    (student) =>
-      student.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      student.rollNo
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
+const cancelEdit = () => {
+setEditingId(null);
 
-  return (
-    <div>
-      <header className="header">
-        <h1>Student Result Management System</h1>
-        <p>Manage student records and academic results</p>
-      </header>
+setStudent({  
+  name: "",  
+  rollNo: "",  
+  studentClass: "",  
+  studentId: "",  
+});
 
-      <main className="container">
+};
 
-        {/* Add / Edit Student Form */}
-        <section className="form-card">
-          <h2>
-            {editingId !== null
-              ? "Edit Student"
-              : "Add New Student"}
-          </h2>
+const deleteStudent = (id) => {
+setStudents(
+students.filter((student) => student.id !== id)
+);
 
-          <p>
-            {editingId !== null
-              ? "Update student information below."
-              : "Enter student information below."}
-          </p>
+if (viewingStudent?.id === id) {  
+  setViewingStudent(null);  
+}
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-grid">
+};
 
-              <div className="form-group">
-                <label>Student Name</label>
+const filteredStudents = students.filter(
+(student) =>
+student.name
+.toLowerCase()
+.includes(searchTerm.toLowerCase()) ||
+student.rollNo
+.toLowerCase()
+.includes(searchTerm.toLowerCase())
+);
 
-                <input
-                  type="text"
-                  name="name"
-                  value={student.name}
-                  onChange={handleChange}
-                  placeholder="Enter student name"
-                />
-              </div>
+return (
+<div>
+<header className="header">
+<h1>Student Result Management System</h1>
+<p>Manage student records and academic results</p>
+</header>
 
-              <div className="form-group">
-                <label>Roll Number</label>
+<main className="container">  
 
-                <input
-                  type="text"
-                  name="rollNo"
-                  value={student.rollNo}
-                  onChange={handleChange}
-                  placeholder="Enter roll number"
-                />
-              </div>
+    {/* Add / Edit Student Form */}  
+    <section className="form-card">  
+      <h2>  
+        {editingId !== null  
+          ? "Edit Student"  
+          : "Add New Student"}  
+      </h2>  
 
-              <div className="form-group">
-                <label>Class</label>
+      <p>  
+        {editingId !== null  
+          ? "Update student information below."  
+          : "Enter student information below."}  
+      </p>  
 
-                <input
-                  type="text"
-                  name="studentClass"
-                  value={student.studentClass}
-                  onChange={handleChange}
-                  placeholder="Enter class"
-                />
-              </div>
+      <form onSubmit={handleSubmit}>  
+        <div className="form-grid">  
 
-              <div className="form-group">
-                <label>Student ID</label>
+          <div className="form-group">  
+            <label>Student Name</label>  
 
-                <input
-                  type="text"
-                  name="studentId"
-                  value={student.studentId}
-                  onChange={handleChange}
-                  placeholder="Enter student ID"
-                />
-              </div>
+            <input  
+              type="text"  
+              name="name"  
+              value={student.name}  
+              onChange={handleChange}  
+              placeholder="Enter student name"  
+            />  
+          </div>  
 
-            </div>
+          <div className="form-group">  
+            <label>Roll Number</label>  
 
-            <button type="submit">
-              {editingId !== null
-                ? "Update Student"
-                : "Add Student"}
-            </button>
+            <input  
+              type="text"  
+              name="rollNo"  
+              value={student.rollNo}  
+              onChange={handleChange}  
+              placeholder="Enter roll number"  
+            />  
+          </div>  
 
-            {editingId !== null && (
-              <button
-                type="button"
-                className="cancel-btn"
-                onClick={cancelEdit}
-              >
-                Cancel
-              </button>
-            )}
-          </form>
-        </section>
+          <div className="form-group">  
+            <label>Class</label>  
 
-        {/* Student Records */}
-        <section className="students-section">
+            <input  
+              type="text"  
+              name="studentClass"  
+              value={student.studentClass}  
+              onChange={handleChange}  
+              placeholder="Enter class"  
+            />  
+          </div>  
 
-          <div className="section-header">
-            <h2>Student Records</h2>
-            <span>{students.length} Students</span>
-          </div>
+          <div className="form-group">  
+            <label>Student ID</label>  
 
-          {/* Search */}
-          <div className="search-box">
-            <input
-              type="text"
-              placeholder="Search by student name or roll number..."
-              value={searchTerm}
-              onChange={(e) =>
-                setSearchTerm(e.target.value)
-              }
-            />
-          </div>
+            <input  
+              type="text"  
+              name="studentId"  
+              value={student.studentId}  
+              onChange={handleChange}  
+              placeholder="Enter student ID"  
+            />  
+          </div>  
 
-          {students.length === 0 ? (
-            <div className="empty-state">
-              <p>No students added yet.</p>
-              <span>
-                Add a student using the form above.
-              </span>
-            </div>
-          ) : filteredStudents.length === 0 ? (
-            <div className="empty-state">
-              <p>No matching student found.</p>
-              <span>
-                Try another name or roll number.
-              </span>
-            </div>
-          ) : (
-            <div className="table-container">
+        </div>  
 
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Student Name</th>
-                    <th>Roll Number</th>
-                    <th>Class</th>
-                    <th>Student ID</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
+        <button type="submit">  
+          {editingId !== null  
+            ? "Update Student"  
+            : "Add Student"}  
+        </button>  
 
-                <tbody>
-                  {filteredStudents.map(
-                    (item, index) => (
-                      <tr key={item.id}>
-                        <td>{index + 1}</td>
+        {editingId !== null && (  
+          <button  
+            type="button"  
+            className="cancel-btn"  
+            onClick={cancelEdit}  
+          >  
+            Cancel  
+          </button>  
+        )}  
+      </form>  
+    </section>  
 
-                        <td>{item.name}</td>
+    {/* Student Records */}  
+    <section className="students-section">  
 
-                        <td>{item.rollNo}</td>
+      <div className="section-header">  
+        <h2>Student Records</h2>  
+        <span>{students.length} Students</span>  
+      </div>  
 
-                        <td>{item.studentClass}</td>
+      {/* Search */}  
+      <div className="search-box">  
+        <input  
+          type="text"  
+          placeholder="Search by student name or roll number..."  
+          value={searchTerm}  
+          onChange={(e) =>  
+            setSearchTerm(e.target.value)  
+          }  
+        />  
+      </div>  
 
-                        <td>{item.studentId}</td>
+      {students.length === 0 ? (  
+        <div className="empty-state">  
+          <p>No students added yet.</p>  
+          <span>  
+            Add a student using the form above.  
+          </span>  
+        </div>  
+      ) : filteredStudents.length === 0 ? (  
+        <div className="empty-state">  
+          <p>No matching student found.</p>  
+          <span>  
+            Try another name or roll number.  
+          </span>  
+        </div>  
+      ) : (  
+        <div className="table-container">  
 
-                        <td>
-                          <button
-                            className="view-btn"
-                            onClick={() =>
-                              viewStudent(item.id)
-                            }
-                          >
-                            View
-                          </button>
+          <table>  
+            <thead>  
+              <tr>  
+                <th>#</th>  
+                <th>Student Name</th>  
+                <th>Roll Number</th>  
+                <th>Class</th>  
+                <th>Student ID</th>  
+                <th>Action</th>  
+              </tr>  
+            </thead>  
 
-                          <button
-                            className="edit-btn"
-                            onClick={() =>
-                              editStudent(item.id)
-                            }
-                          >
-                            Edit
-                          </button>
+            <tbody>  
+              {filteredStudents.map(  
+                (item, index) => (  
+                  <tr key={item.id}>  
+                    <td>{index + 1}</td>  
 
-                          <button
-                            className="delete-btn"
-                            onClick={() =>
-                              deleteStudent(item.id)
-                            }
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
+                    <td>{item.name}</td>  
 
-            </div>
-          )}
-        </section>
+                    <td>{item.rollNo}</td>  
 
-        {/* Student Details */}
-        {viewingStudent && (
-          <section className="details-card">
-            <div className="details-header">
-              <h2>Student Details</h2>
+                    <td>{item.studentClass}</td>  
 
-              <button
-                className="close-btn"
-                onClick={closeStudentDetails}
-              >
-                ×
-              </button>
-            </div>
+                    <td>{item.studentId}</td>  
 
-            <div className="details-grid">
-              <div>
-                <span>Student Name</span>
-                <strong>{viewingStudent.name}</strong>
-              </div>
+                    <td>  
+                      <button  
+                        className="view-btn"  
+                        onClick={() =>  
+                          viewStudent(item.id)  
+                        }  
+                      >  
+                        View  
+                      </button>  
 
-              <div>
-                <span>Roll Number</span>
-                <strong>{viewingStudent.rollNo}</strong>
-              </div>
+                      <button  
+                        className="edit-btn"  
+                        onClick={() =>  
+                          editStudent(item.id)  
+                        }  
+                      >  
+                        Edit  
+                      </button>  
 
-              <div>
-                <span>Class</span>
-                <strong>{viewingStudent.studentClass}</strong>
-              </div>
+                      <button  
+                        className="delete-btn"  
+                        onClick={() =>  
+                          deleteStudent(item.id)  
+                        }  
+                      >  
+                        Delete  
+                      </button>  
+                    </td>  
+                  </tr>  
+                )  
+              )}  
+            </tbody>  
+          </table>  
 
-              <div>
-                <span>Student ID</span>
-                <strong>{viewingStudent.studentId}</strong>
-              </div>
-            </div>
-          </section>
-        )}
+        </div>  
+      )}  
+    </section>  
 
-      </main>
-    </div>
-  );
+    {/* Student Details */}  
+    {viewingStudent && (  
+      <section className="details-card">  
+        <div className="details-header">  
+          <h2>Student Details</h2>  
+
+          <button  
+            className="close-btn"  
+            onClick={closeStudentDetails}  
+          >  
+            ×  
+          </button>  
+        </div>  
+
+        <div className="details-grid">  
+          <div>  
+            <span>Student Name</span>  
+            <strong>{viewingStudent.name}</strong>  
+          </div>  
+
+          <div>  
+            <span>Roll Number</span>  
+            <strong>{viewingStudent.rollNo}</strong>  
+          </div>  
+
+          <div>  
+            <span>Class</span>  
+            <strong>{viewingStudent.studentClass}</strong>  
+          </div>  
+
+          <div>  
+            <span>Student ID</span>  
+            <strong>{viewingStudent.studentId}</strong>  
+          </div>  
+        </div>  
+      </section>  
+    )}  
+
+  </main>  
+</div>
+
+);
 }
 
 export default App;
