@@ -4,7 +4,7 @@ import StudentManagement from "./components/StudentManagement";
 import ResultManagement from "./components/ResultManagement";
 
 function App() {
-  const [activePage, setActivePage] = useState("dashboard");
+  const [activePage, setActivePage] = useState("students");
 
   return (
     <div className="app">
@@ -16,21 +16,22 @@ function App() {
       <nav className="navbar">
         <div className="nav-container">
           <button
-            className={activePage === "dashboard" ? "nav-btn active" : "nav-btn"}
-            onClick={() => setActivePage("dashboard")}
-          >
-            Dashboard
-          </button>
-
-          <button
-            className={activePage === "students" ? "nav-btn active" : "nav-btn"}
+            className={
+              activePage === "students"
+                ? "nav-btn active"
+                : "nav-btn"
+            }
             onClick={() => setActivePage("students")}
           >
             Students
           </button>
 
           <button
-            className={activePage === "results" ? "nav-btn active" : "nav-btn"}
+            className={
+              activePage === "results"
+                ? "nav-btn active"
+                : "nav-btn"
+            }
             onClick={() => setActivePage("results")}
           >
             Results
@@ -39,33 +40,6 @@ function App() {
       </nav>
 
       <main className="container">
-        {activePage === "dashboard" && (
-          <section className="dashboard">
-            <h2>Dashboard</h2>
-            <p>Welcome to Student Result Management System</p>
-
-            <div className="dashboard-cards">
-              <div
-                className="dashboard-card"
-                onClick={() => setActivePage("students")}
-              >
-                <h3>Students</h3>
-                <p>Manage student records</p>
-                <button>Open Students</button>
-              </div>
-
-              <div
-                className="dashboard-card"
-                onClick={() => setActivePage("results")}
-              >
-                <h3>Results</h3>
-                <p>Manage academic results</p>
-                <button>Open Results</button>
-              </div>
-            </div>
-          </section>
-        )}
-
         {activePage === "students" && (
           <StudentManagement />
         )}

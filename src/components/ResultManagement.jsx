@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 function ResultManagement() {
   const [students, setStudents] = useState([]);
+
   const [results, setResults] = useState(() => {
     const savedResults = localStorage.getItem("results");
     return savedResults ? JSON.parse(savedResults) : [];
@@ -13,6 +14,8 @@ function ResultManagement() {
     totalMarks: "",
     obtainedMarks: "",
   });
+
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     const savedStudents = localStorage.getItem("students");
@@ -69,16 +72,72 @@ function ResultManagement() {
       return;
     }
 
-    const newResult = {
-      id: Date.now(),
-      studentId: selectedStudent.id,
-      studentName: selectedStudent.name,
-      subject: result.subject,
-      totalMarks: Number(result.totalMarks),
-      obtainedMarks: Number(result.obtainedMarks),
-    };
+    if (editingId !== null) {
+      setResults(
+        results.map((item) =>
+          item.id === editingId
+            ? {
+                ...item,
+                studentId: selectedStudent.id,
+                studentName: selectedStudent.name,
+                subject: result.subject,
+                totalMarks: Number(result.totalMarks),
+                obtainedMarks: Number(
+                  result.obtainedMarks
+                ),
+              }
+            : item
+        )
+      );
 
-    setResults([...results, newResult]);
+      setEditingId(null);
+    } else {
+      const newResult = {
+        id: Date.now(),
+        studentId: selectedStudent.id,
+        studentName: selectedStudent.name,
+        subject: result.subject,
+        totalMarks: Number(result.totalMarks),
+        obtainedMarks: Number(result.obtainedMarks),
+      };
+
+      setResults([...results, newResult]);
+    }
+
+    setResult({
+      studentId: "",
+      subject: "",
+      totalMarks: "",
+      obtainedMarks: "",
+    });
+  };
+
+  const editResult = (id) => {
+    const selectedResult = results.find(
+      (item) => item.id === id
+    );
+
+    if (selectedResult) {
+      setResult({
+        studentId: String(selectedResult.studentId),
+        subject: selectedResult.subject,
+        totalMarks: String(selectedResult.totalMarks),
+        obtainedMarks: String(
+          selectedResult.obtainedMarks
+        ),
+      });
+
+      setEditingId(id);
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
 
     setResult({
       studentId: "",
@@ -92,6 +151,10 @@ function ResultManagement() {
     setResults(
       results.filter((item) => item.id !== id)
     );
+
+    if (editingId === id) {
+      cancelEdit();
+    }
   };
 
   const calculatePercentage = (
@@ -101,13 +164,26 @@ function ResultManagement() {
     return ((obtained / total) * 100).toFixed(1);
   };
 
+  const getStatus = (obtained, total) => {
+    const percentage =
+      (obtained / total) * 100;
+
+    return percentage >= 40 ? "Pass" : "Fail";
+  };
+
   return (
     <>
       <section className="form-card result-form">
-        <h2>Student Results</h2>
+        <h2>
+          {editingId !== null
+            ? "Edit Student Result"
+            : "Student Results"}
+        </h2>
 
         <p>
-          Add academic result for a student.
+          {editingId !== null
+            ? "Update academic result below."
+            : "Add academic result for a student."}
         </p>
 
         <form onSubmit={handleSubmit}>
@@ -176,8 +252,20 @@ function ResultManagement() {
           </div>
 
           <button type="submit">
-            Add Result
+            {editingId !== null
+              ? "Update Result"
+              : "Add Result"}
           </button>
+
+          {editingId !== null && (
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={cancelEdit}
+            >
+              Cancel
+            </button>
+          )}
         </form>
       </section>
 
@@ -193,6 +281,7 @@ function ResultManagement() {
         {results.length === 0 ? (
           <div className="empty-state">
             <p>No results added yet.</p>
+
             <span>
               Add a result using the form above.
             </span>
@@ -208,43 +297,72 @@ function ResultManagement() {
                   <th>Total Marks</th>
                   <th>Obtained Marks</th>
                   <th>Percentage</th>
+                  <th>Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
 
               <tbody>
-                {results.map((item, index) => (
-                  <tr key={item.id}>
-                    <td>{index + 1}</td>
+                {results.map((item, index) => {
+                  const percentage =
+                    calculatePercentage(
+                      item.obtainedMarks,
+                      item.totalMarks
+                    );
 
-                    <td>{item.studentName}</td>
+                  const status = getStatus(
+                    item.obtainedMarks,
+                    item.totalMarks
+                  );
 
-                    <td>{item.subject}</td>
+                  return (
+                    <tr key={item.id}>
+                      <td>{index + 1}</td>
 
-                    <td>{item.totalMarks}</td>
+                      <td>{item.studentName}</td>
 
-                    <td>{item.obtainedMarks}</td>
+                      <td>{item.subject}</td>
 
-                    <td>
-                      {calculatePercentage(
-                        item.obtainedMarks,
-                        item.totalMarks
-                      )}
-                      %
-                    </td>
+                      <td>{item.totalMarks}</td>
 
-                    <td>
-                      <button
-                        className="delete-btn"
-                        onClick={() =>
-                          deleteResult(item.id)
-                        }
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      <td>{item.obtainedMarks}</td>
+
+                      <td>{percentage}%</td>
+
+                      <td>
+                        <span
+                          className={
+                            status === "Pass"
+                              ? "pass-status"
+                              : "fail-status"
+                          }
+                        >
+                          {status}
+                        </span>
+                      </td>
+
+                      <td>
+                        <button
+                          className="edit-btn"
+                          onClick={() =>
+                            editResult(item.id)
+                          }
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="delete-btn"
+                          onClick={() =>
+                            deleteResult(item.id)
+                          }
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
