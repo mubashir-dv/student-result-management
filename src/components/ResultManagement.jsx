@@ -26,10 +26,7 @@ function ResultManagement() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(
-      "results",
-      JSON.stringify(results)
-    );
+    localStorage.setItem("results", JSON.stringify(results));
   }, [results]);
 
   const handleChange = (e) => {
@@ -52,19 +49,26 @@ function ResultManagement() {
       return;
     }
 
-    if (
-      Number(result.obtainedMarks) >
-      Number(result.totalMarks)
-    ) {
-      alert(
-        "Obtained marks cannot be greater than total marks."
-      );
+    const totalMarks = Number(result.totalMarks);
+    const obtainedMarks = Number(result.obtainedMarks);
+
+    if (totalMarks <= 0) {
+      alert("Total marks must be greater than 0.");
+      return;
+    }
+
+    if (obtainedMarks < 0) {
+      alert("Obtained marks cannot be negative.");
+      return;
+    }
+
+    if (obtainedMarks > totalMarks) {
+      alert("Obtained marks cannot be greater than total marks.");
       return;
     }
 
     const selectedStudent = students.find(
-      (student) =>
-        student.id === Number(result.studentId)
+      (student) => student.id === Number(result.studentId)
     );
 
     if (!selectedStudent) {
@@ -80,11 +84,10 @@ function ResultManagement() {
                 ...item,
                 studentId: selectedStudent.id,
                 studentName: selectedStudent.name,
+                rollNo: selectedStudent.rollNo,
                 subject: result.subject,
-                totalMarks: Number(result.totalMarks),
-                obtainedMarks: Number(
-                  result.obtainedMarks
-                ),
+                totalMarks,
+                obtainedMarks,
               }
             : item
         )
@@ -96,9 +99,10 @@ function ResultManagement() {
         id: Date.now(),
         studentId: selectedStudent.id,
         studentName: selectedStudent.name,
+        rollNo: selectedStudent.rollNo,
         subject: result.subject,
-        totalMarks: Number(result.totalMarks),
-        obtainedMarks: Number(result.obtainedMarks),
+        totalMarks,
+        obtainedMarks,
       };
 
       setResults([...results, newResult]);
@@ -122,9 +126,7 @@ function ResultManagement() {
         studentId: String(selectedResult.studentId),
         subject: selectedResult.subject,
         totalMarks: String(selectedResult.totalMarks),
-        obtainedMarks: String(
-          selectedResult.obtainedMarks
-        ),
+        obtainedMarks: String(selectedResult.obtainedMarks),
       });
 
       setEditingId(id);
@@ -157,19 +159,54 @@ function ResultManagement() {
     }
   };
 
-  const calculatePercentage = (
-    obtained,
-    total
-  ) => {
+  const calculatePercentage = (obtained, total) => {
+    if (!total) {
+      return "0.0";
+    }
+
     return ((obtained / total) * 100).toFixed(1);
   };
 
-  const getStatus = (obtained, total) => {
-    const percentage =
-      (obtained / total) * 100;
-
-    return percentage >= 40 ? "Pass" : "Fail";
+  const getStatus = (percentage) => {
+    return Number(percentage) >= 40 ? "Pass" : "Fail";
   };
+
+  const studentSummaries = students
+    .map((student) => {
+      const studentResults = results.filter(
+        (item) => item.studentId === student.id
+      );
+
+      if (studentResults.length === 0) {
+        return null;
+      }
+
+      const totalMarks = studentResults.reduce(
+        (sum, item) => sum + Number(item.totalMarks),
+        0
+      );
+
+      const obtainedMarks = studentResults.reduce(
+        (sum, item) => sum + Number(item.obtainedMarks),
+        0
+      );
+
+      const percentage =
+        totalMarks > 0
+          ? ((obtainedMarks / totalMarks) * 100).toFixed(1)
+          : "0.0";
+
+      return {
+        id: student.id,
+        name: student.name,
+        rollNo: student.rollNo,
+        subjects: studentResults,
+        totalMarks,
+        obtainedMarks,
+        percentage,
+      };
+    })
+    .filter(Boolean);
 
   return (
     <>
@@ -205,8 +242,7 @@ function ResultManagement() {
                     key={student.id}
                     value={student.id}
                   >
-                    {student.name} -{" "}
-                    {student.rollNo}
+                    {student.name} - {student.rollNo}
                   </option>
                 ))}
               </select>
@@ -273,9 +309,7 @@ function ResultManagement() {
         <div className="section-header">
           <h2>Results List</h2>
 
-          <span>
-            {results.length} Results
-          </span>
+          <span>{results.length} Results</span>
         </div>
 
         {results.length === 0 ? (
@@ -293,6 +327,7 @@ function ResultManagement() {
                 <tr>
                   <th>#</th>
                   <th>Student Name</th>
+                  <th>Roll Number</th>
                   <th>Subject</th>
                   <th>Total Marks</th>
                   <th>Obtained Marks</th>
@@ -304,22 +339,20 @@ function ResultManagement() {
 
               <tbody>
                 {results.map((item, index) => {
-                  const percentage =
-                    calculatePercentage(
-                      item.obtainedMarks,
-                      item.totalMarks
-                    );
-
-                  const status = getStatus(
+                  const percentage = calculatePercentage(
                     item.obtainedMarks,
                     item.totalMarks
                   );
+
+                  const status = getStatus(percentage);
 
                   return (
                     <tr key={item.id}>
                       <td>{index + 1}</td>
 
                       <td>{item.studentName}</td>
+
+                      <td>{item.rollNo}</td>
 
                       <td>{item.subject}</td>
 
@@ -368,6 +401,135 @@ function ResultManagement() {
           </div>
         )}
       </section>
+
+      {studentSummaries.length > 0 && (
+        <section className="students-section">
+          <div className="section-header">
+            <h2>Student Result Summary</h2>
+
+            <span>
+              {studentSummaries.length} Students
+            </span>
+          </div>
+
+          {studentSummaries.map((student) => {
+            const status = getStatus(student.percentage);
+
+            return (
+              <div
+                key={student.id}
+                style={{
+                  marginBottom: "25px",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "18px",
+                    background: "#f3f4f6",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "15px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div>
+                    <h3>{student.name}</h3>
+
+                    <p
+                      style={{
+                        marginTop: "5px",
+                        color: "#6b7280",
+                      }}
+                    >
+                      Roll Number: {student.rollNo}
+                    </p>
+                  </div>
+
+                  <span
+                    className={
+                      status === "Pass"
+                        ? "pass-status"
+                        : "fail-status"
+                    }
+                  >
+                    {status}
+                  </span>
+                </div>
+
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Subject</th>
+                        <th>Total Marks</th>
+                        <th>Obtained Marks</th>
+                        <th>Percentage</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {student.subjects.map(
+                        (subject, index) => {
+                          const percentage =
+                            calculatePercentage(
+                              subject.obtainedMarks,
+                              subject.totalMarks
+                            );
+
+                          return (
+                            <tr key={subject.id}>
+                              <td>{index + 1}</td>
+
+                              <td>{subject.subject}</td>
+
+                              <td>
+                                {subject.totalMarks}
+                              </td>
+
+                              <td>
+                                {subject.obtainedMarks}
+                              </td>
+
+                              <td>
+                                {percentage}%
+                              </td>
+                            </tr>
+                          );
+                        }
+                      )}
+                    </tbody>
+
+                    <tfoot>
+                      <tr>
+                        <th colSpan="2">
+                          Overall Result
+                        </th>
+
+                        <th>
+                          {student.totalMarks}
+                        </th>
+
+                        <th>
+                          {student.obtainedMarks}
+                        </th>
+
+                        <th>
+                          {student.percentage}%
+                        </th>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
+        </section>
+      )}
     </>
   );
 }
