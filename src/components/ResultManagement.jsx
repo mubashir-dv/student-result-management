@@ -36,21 +36,33 @@ function ResultManagement() {
     });
   };
 
+  const resetForm = () => {
+    setResult({
+      studentId: "",
+      subject: "",
+      totalMarks: "",
+      obtainedMarks: "",
+    });
+
+    setEditingId(null);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const subjectName = result.subject.trim();
+    const totalMarks = Number(result.totalMarks);
+    const obtainedMarks = Number(result.obtainedMarks);
+
     if (
       !result.studentId ||
-      !result.subject ||
-      !result.totalMarks ||
-      !result.obtainedMarks
+      !subjectName ||
+      result.totalMarks === "" ||
+      result.obtainedMarks === ""
     ) {
       alert("Please fill all fields.");
       return;
     }
-
-    const totalMarks = Number(result.totalMarks);
-    const obtainedMarks = Number(result.obtainedMarks);
 
     if (totalMarks <= 0) {
       alert("Total marks must be greater than 0.");
@@ -76,6 +88,21 @@ function ResultManagement() {
       return;
     }
 
+    const duplicateSubject = results.some(
+      (item) =>
+        item.studentId === selectedStudent.id &&
+        item.subject.trim().toLowerCase() ===
+          subjectName.toLowerCase() &&
+        item.id !== editingId
+    );
+
+    if (duplicateSubject) {
+      alert(
+        "This subject already exists for this student."
+      );
+      return;
+    }
+
     if (editingId !== null) {
       setResults(
         results.map((item) =>
@@ -85,22 +112,20 @@ function ResultManagement() {
                 studentId: selectedStudent.id,
                 studentName: selectedStudent.name,
                 rollNo: selectedStudent.rollNo,
-                subject: result.subject,
+                subject: subjectName,
                 totalMarks,
                 obtainedMarks,
               }
             : item
         )
       );
-
-      setEditingId(null);
     } else {
       const newResult = {
         id: Date.now(),
         studentId: selectedStudent.id,
         studentName: selectedStudent.name,
         rollNo: selectedStudent.rollNo,
-        subject: result.subject,
+        subject: subjectName,
         totalMarks,
         obtainedMarks,
       };
@@ -108,12 +133,7 @@ function ResultManagement() {
       setResults([...results, newResult]);
     }
 
-    setResult({
-      studentId: "",
-      subject: "",
-      totalMarks: "",
-      obtainedMarks: "",
-    });
+    resetForm();
   };
 
   const editResult = (id) => {
@@ -121,31 +141,22 @@ function ResultManagement() {
       (item) => item.id === id
     );
 
-    if (selectedResult) {
-      setResult({
-        studentId: String(selectedResult.studentId),
-        subject: selectedResult.subject,
-        totalMarks: String(selectedResult.totalMarks),
-        obtainedMarks: String(selectedResult.obtainedMarks),
-      });
-
-      setEditingId(id);
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+    if (!selectedResult) {
+      return;
     }
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
 
     setResult({
-      studentId: "",
-      subject: "",
-      totalMarks: "",
-      obtainedMarks: "",
+      studentId: String(selectedResult.studentId),
+      subject: selectedResult.subject,
+      totalMarks: String(selectedResult.totalMarks),
+      obtainedMarks: String(selectedResult.obtainedMarks),
+    });
+
+    setEditingId(id);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
     });
   };
 
@@ -155,7 +166,7 @@ function ResultManagement() {
     );
 
     if (editingId === id) {
-      cancelEdit();
+      resetForm();
     }
   };
 
@@ -168,7 +179,9 @@ function ResultManagement() {
   };
 
   const getStatus = (percentage) => {
-    return Number(percentage) >= 40 ? "Pass" : "Fail";
+    return Number(percentage) >= 40
+      ? "Pass"
+      : "Fail";
   };
 
   const studentSummaries = students
@@ -182,18 +195,23 @@ function ResultManagement() {
       }
 
       const totalMarks = studentResults.reduce(
-        (sum, item) => sum + Number(item.totalMarks),
+        (sum, item) =>
+          sum + Number(item.totalMarks),
         0
       );
 
       const obtainedMarks = studentResults.reduce(
-        (sum, item) => sum + Number(item.obtainedMarks),
+        (sum, item) =>
+          sum + Number(item.obtainedMarks),
         0
       );
 
       const percentage =
         totalMarks > 0
-          ? ((obtainedMarks / totalMarks) * 100).toFixed(1)
+          ? (
+              (obtainedMarks / totalMarks) *
+              100
+            ).toFixed(1)
           : "0.0";
 
       return {
@@ -232,6 +250,7 @@ function ResultManagement() {
                 name="studentId"
                 value={result.studentId}
                 onChange={handleChange}
+                required
               >
                 <option value="">
                   Select student
@@ -242,7 +261,8 @@ function ResultManagement() {
                     key={student.id}
                     value={student.id}
                   >
-                    {student.name} - {student.rollNo}
+                    {student.name} -{" "}
+                    {student.rollNo}
                   </option>
                 ))}
               </select>
@@ -257,6 +277,7 @@ function ResultManagement() {
                 value={result.subject}
                 onChange={handleChange}
                 placeholder="Enter subject"
+                required
               />
             </div>
 
@@ -270,6 +291,7 @@ function ResultManagement() {
                 onChange={handleChange}
                 placeholder="Enter total marks"
                 min="1"
+                required
               />
             </div>
 
@@ -283,6 +305,7 @@ function ResultManagement() {
                 onChange={handleChange}
                 placeholder="Enter obtained marks"
                 min="0"
+                required
               />
             </div>
           </div>
@@ -297,7 +320,7 @@ function ResultManagement() {
             <button
               type="button"
               className="cancel-btn"
-              onClick={cancelEdit}
+              onClick={resetForm}
             >
               Cancel
             </button>
@@ -309,7 +332,9 @@ function ResultManagement() {
         <div className="section-header">
           <h2>Results List</h2>
 
-          <span>{results.length} Results</span>
+          <span>
+            {results.length} Results
+          </span>
         </div>
 
         {results.length === 0 ? (
@@ -339,12 +364,14 @@ function ResultManagement() {
 
               <tbody>
                 {results.map((item, index) => {
-                  const percentage = calculatePercentage(
-                    item.obtainedMarks,
-                    item.totalMarks
-                  );
+                  const percentage =
+                    calculatePercentage(
+                      item.obtainedMarks,
+                      item.totalMarks
+                    );
 
-                  const status = getStatus(percentage);
+                  const status =
+                    getStatus(percentage);
 
                   return (
                     <tr key={item.id}>
@@ -358,9 +385,13 @@ function ResultManagement() {
 
                       <td>{item.totalMarks}</td>
 
-                      <td>{item.obtainedMarks}</td>
+                      <td>
+                        {item.obtainedMarks}
+                      </td>
 
-                      <td>{percentage}%</td>
+                      <td>
+                        {percentage}%
+                      </td>
 
                       <td>
                         <span
@@ -413,7 +444,9 @@ function ResultManagement() {
           </div>
 
           {studentSummaries.map((student) => {
-            const status = getStatus(student.percentage);
+            const status = getStatus(
+              student.percentage
+            );
 
             return (
               <div
@@ -430,7 +463,8 @@ function ResultManagement() {
                     padding: "18px",
                     background: "#f3f4f6",
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent:
+                      "space-between",
                     alignItems: "center",
                     gap: "15px",
                     flexWrap: "wrap",
@@ -445,7 +479,8 @@ function ResultManagement() {
                         color: "#6b7280",
                       }}
                     >
-                      Roll Number: {student.rollNo}
+                      Roll Number:{" "}
+                      {student.rollNo}
                     </p>
                   </div>
 
@@ -467,7 +502,9 @@ function ResultManagement() {
                         <th>#</th>
                         <th>Subject</th>
                         <th>Total Marks</th>
-                        <th>Obtained Marks</th>
+                        <th>
+                          Obtained Marks
+                        </th>
                         <th>Percentage</th>
                       </tr>
                     </thead>
@@ -483,16 +520,24 @@ function ResultManagement() {
 
                           return (
                             <tr key={subject.id}>
-                              <td>{index + 1}</td>
-
-                              <td>{subject.subject}</td>
-
                               <td>
-                                {subject.totalMarks}
+                                {index + 1}
                               </td>
 
                               <td>
-                                {subject.obtainedMarks}
+                                {subject.subject}
+                              </td>
+
+                              <td>
+                                {
+                                  subject.totalMarks
+                                }
+                              </td>
+
+                              <td>
+                                {
+                                  subject.obtainedMarks
+                                }
                               </td>
 
                               <td>
