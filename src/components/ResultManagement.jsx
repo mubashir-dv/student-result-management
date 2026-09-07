@@ -16,6 +16,7 @@ function ResultManagement() {
   });
 
   const [editingId, setEditingId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const savedStudents = localStorage.getItem("students");
@@ -97,9 +98,7 @@ function ResultManagement() {
     );
 
     if (duplicateSubject) {
-      alert(
-        "This subject already exists for this student."
-      );
+      alert("This subject already exists for this student.");
       return;
     }
 
@@ -184,6 +183,42 @@ function ResultManagement() {
       : "Fail";
   };
 
+  const getGrade = (percentage) => {
+    const value = Number(percentage);
+
+    if (value >= 90) {
+      return "A+";
+    }
+
+    if (value >= 80) {
+      return "A";
+    }
+
+    if (value >= 70) {
+      return "B";
+    }
+
+    if (value >= 60) {
+      return "C";
+    }
+
+    if (value >= 50) {
+      return "D";
+    }
+
+    return "F";
+  };
+
+  const filteredResults = results.filter(
+    (item) =>
+      item.studentName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      item.rollNo
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+  );
+
   const studentSummaries = students
     .map((student) => {
       const studentResults = results.filter(
@@ -252,17 +287,22 @@ function ResultManagement() {
                 onChange={handleChange}
                 required
               >
-                <option value="">
+                <option value="" disabled>
                   Select student
                 </option>
+
+                {result.studentId && (
+                  <option value="">
+                    Clear Student
+                  </option>
+                )}
 
                 {students.map((student) => (
                   <option
                     key={student.id}
                     value={student.id}
                   >
-                    {student.name} -{" "}
-                    {student.rollNo}
+                    {student.name} - {student.rollNo}
                   </option>
                 ))}
               </select>
@@ -333,8 +373,19 @@ function ResultManagement() {
           <h2>Results List</h2>
 
           <span>
-            {results.length} Results
+            {filteredResults.length} Results
           </span>
+        </div>
+
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search by student name or roll number..."
+            value={searchTerm}
+            onChange={(e) =>
+              setSearchTerm(e.target.value)
+            }
+          />
         </div>
 
         {results.length === 0 ? (
@@ -343,6 +394,14 @@ function ResultManagement() {
 
             <span>
               Add a result using the form above.
+            </span>
+          </div>
+        ) : filteredResults.length === 0 ? (
+          <div className="empty-state">
+            <p>No matching result found.</p>
+
+            <span>
+              Try another student name or roll number.
             </span>
           </div>
         ) : (
@@ -357,21 +416,22 @@ function ResultManagement() {
                   <th>Total Marks</th>
                   <th>Obtained Marks</th>
                   <th>Percentage</th>
+                  <th>Grade</th>
                   <th>Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
 
               <tbody>
-                {results.map((item, index) => {
+                {filteredResults.map((item, index) => {
                   const percentage =
                     calculatePercentage(
                       item.obtainedMarks,
                       item.totalMarks
                     );
 
-                  const status =
-                    getStatus(percentage);
+                  const grade = getGrade(percentage);
+                  const status = getStatus(percentage);
 
                   return (
                     <tr key={item.id}>
@@ -385,12 +445,14 @@ function ResultManagement() {
 
                       <td>{item.totalMarks}</td>
 
-                      <td>
-                        {item.obtainedMarks}
-                      </td>
+                      <td>{item.obtainedMarks}</td>
+
+                      <td>{percentage}%</td>
 
                       <td>
-                        {percentage}%
+                        <span className="grade-status">
+                          {grade}
+                        </span>
                       </td>
 
                       <td>
@@ -448,6 +510,10 @@ function ResultManagement() {
               student.percentage
             );
 
+            const grade = getGrade(
+              student.percentage
+            );
+
             return (
               <div
                 key={student.id}
@@ -463,8 +529,7 @@ function ResultManagement() {
                     padding: "18px",
                     background: "#f3f4f6",
                     display: "flex",
-                    justifyContent:
-                      "space-between",
+                    justifyContent: "space-between",
                     alignItems: "center",
                     gap: "15px",
                     flexWrap: "wrap",
@@ -479,20 +544,31 @@ function ResultManagement() {
                         color: "#6b7280",
                       }}
                     >
-                      Roll Number:{" "}
-                      {student.rollNo}
+                      Roll Number: {student.rollNo}
                     </p>
                   </div>
 
-                  <span
-                    className={
-                      status === "Pass"
-                        ? "pass-status"
-                        : "fail-status"
-                    }
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
+                    }}
                   >
-                    {status}
-                  </span>
+                    <span className="grade-status">
+                      Grade {grade}
+                    </span>
+
+                    <span
+                      className={
+                        status === "Pass"
+                          ? "pass-status"
+                          : "fail-status"
+                      }
+                    >
+                      {status}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="table-container">
@@ -502,10 +578,9 @@ function ResultManagement() {
                         <th>#</th>
                         <th>Subject</th>
                         <th>Total Marks</th>
-                        <th>
-                          Obtained Marks
-                        </th>
+                        <th>Obtained Marks</th>
                         <th>Percentage</th>
+                        <th>Grade</th>
                       </tr>
                     </thead>
 
@@ -518,30 +593,33 @@ function ResultManagement() {
                               subject.totalMarks
                             );
 
+                          const grade =
+                            getGrade(percentage);
+
                           return (
                             <tr key={subject.id}>
-                              <td>
-                                {index + 1}
-                              </td>
+                              <td>{index + 1}</td>
 
                               <td>
                                 {subject.subject}
                               </td>
 
                               <td>
-                                {
-                                  subject.totalMarks
-                                }
+                                {subject.totalMarks}
                               </td>
 
                               <td>
-                                {
-                                  subject.obtainedMarks
-                                }
+                                {subject.obtainedMarks}
                               </td>
 
                               <td>
                                 {percentage}%
+                              </td>
+
+                              <td>
+                                <span className="grade-status">
+                                  {grade}
+                                </span>
                               </td>
                             </tr>
                           );
@@ -565,6 +643,10 @@ function ResultManagement() {
 
                         <th>
                           {student.percentage}%
+                        </th>
+
+                        <th>
+                          {grade}
                         </th>
                       </tr>
                     </tfoot>
