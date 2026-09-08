@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 
+function getInitials(name) {
+  if (!name) return "?";
+  return name.trim().charAt(0).toUpperCase();
+}
+
 function ResultManagement() {
   const [students, setStudents] = useState([]);
 
@@ -17,6 +22,8 @@ function ResultManagement() {
 
   const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [errors, setErrors] = useState({});
+  const [printingStudent, setPrintingStudent] = useState(null);
 
   useEffect(() => {
     const savedStudents = localStorage.getItem("students");
@@ -30,11 +37,31 @@ function ResultManagement() {
     localStorage.setItem("results", JSON.stringify(results));
   }, [results]);
 
+  useEffect(() => {
+    if (printingStudent) {
+      const timer = setTimeout(() => {
+        window.print();
+      }, 100);
+
+      const handleAfterPrint = () => setPrintingStudent(null);
+      window.addEventListener("afterprint", handleAfterPrint);
+
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener("afterprint", handleAfterPrint);
+      };
+    }
+  }, [printingStudent]);
+
   const handleChange = (e) => {
     setResult({
       ...result,
       [e.target.name]: e.target.value,
     });
+
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: "" });
+    }
   };
 
   const resetForm = () => {
@@ -46,6 +73,52 @@ function ResultManagement() {
     });
 
     setEditingId(null);
+    setErrors({});
+  };
+
+  const validate = (selectedStudent, subjectName, totalMarks, obtainedMarks) => {
+    const newErrors = {};
+
+    if (!result.studentId) {
+      newErrors.studentId = "Please select a student.";
+    }
+
+    if (!subjectName) {
+      newErrors.subject = "Subject is required.";
+    }
+
+    if (result.totalMarks === "") {
+      newErrors.totalMarks = "Total marks is required.";
+    } else if (totalMarks <= 0) {
+      newErrors.totalMarks = "Total marks must be greater than 0.";
+    }
+
+    if (result.obtainedMarks === "") {
+      newErrors.obtainedMarks = "Obtained marks is required.";
+    } else if (obtainedMarks < 0) {
+      newErrors.obtainedMarks = "Obtained marks cannot be negative.";
+    } else if (obtainedMarks > totalMarks) {
+      newErrors.obtainedMarks =
+        "Obtained marks cannot exceed total marks.";
+    }
+
+    if (selectedStudent && subjectName) {
+      const duplicateSubject = results.some(
+        (item) =>
+          item.studentId === selectedStudent.id &&
+          item.subject.trim().toLowerCase() ===
+            subjectName.toLowerCase() &&
+          item.id !== editingId
+      );
+
+      if (duplicateSubject) {
+        newErrors.subject =
+          "This subject already exists for this student.";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
@@ -55,50 +128,11 @@ function ResultManagement() {
     const totalMarks = Number(result.totalMarks);
     const obtainedMarks = Number(result.obtainedMarks);
 
-    if (
-      !result.studentId ||
-      !subjectName ||
-      result.totalMarks === "" ||
-      result.obtainedMarks === ""
-    ) {
-      alert("Please fill all fields.");
-      return;
-    }
-
-    if (totalMarks <= 0) {
-      alert("Total marks must be greater than 0.");
-      return;
-    }
-
-    if (obtainedMarks < 0) {
-      alert("Obtained marks cannot be negative.");
-      return;
-    }
-
-    if (obtainedMarks > totalMarks) {
-      alert("Obtained marks cannot be greater than total marks.");
-      return;
-    }
-
     const selectedStudent = students.find(
       (student) => student.id === Number(result.studentId)
     );
 
-    if (!selectedStudent) {
-      alert("Please select a student.");
-      return;
-    }
-
-    const duplicateSubject = results.some(
-      (item) =>
-        item.studentId === selectedStudent.id &&
-        item.subject.trim().toLowerCase() ===
-          subjectName.toLowerCase() &&
-        item.id !== editingId
-    );
-
-    if (duplicateSubject) {
-      alert("This subject already exists for this student.");
+    if (!validate(selectedStudent, subjectName, totalMarks, obtainedMarks)) {
       return;
     }
 
@@ -285,7 +319,7 @@ function ResultManagement() {
                 name="studentId"
                 value={result.studentId}
                 onChange={handleChange}
-                required
+                className={errors.studentId ? "input-error" : ""}
               >
                 <option value="" disabled>
                   Select student
@@ -306,6 +340,11 @@ function ResultManagement() {
                   </option>
                 ))}
               </select>
+              {errors.studentId && (
+                <span className="field-error">
+                  {errors.studentId}
+                </span>
+              )}
             </div>
 
             <div className="form-group">
@@ -317,8 +356,11 @@ function ResultManagement() {
                 value={result.subject}
                 onChange={handleChange}
                 placeholder="Enter subject"
-                required
+                className={errors.subject ? "input-error" : ""}
               />
+              {errors.subject && (
+                <span className="field-error">{errors.subject}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -331,8 +373,13 @@ function ResultManagement() {
                 onChange={handleChange}
                 placeholder="Enter total marks"
                 min="1"
-                required
+                className={errors.totalMarks ? "input-error" : ""}
               />
+              {errors.totalMarks && (
+                <span className="field-error">
+                  {errors.totalMarks}
+                </span>
+              )}
             </div>
 
             <div className="form-group">
@@ -345,8 +392,13 @@ function ResultManagement() {
                 onChange={handleChange}
                 placeholder="Enter obtained marks"
                 min="0"
-                required
+                className={errors.obtainedMarks ? "input-error" : ""}
               />
+              {errors.obtainedMarks && (
+                <span className="field-error">
+                  {errors.obtainedMarks}
+                </span>
+              )}
             </div>
           </div>
 
@@ -437,7 +489,14 @@ function ResultManagement() {
                     <tr key={item.id}>
                       <td>{index + 1}</td>
 
-                      <td>{item.studentName}</td>
+                      <td>
+                        <div className="name-cell">
+                          <span className="avatar">
+                            {getInitials(item.studentName)}
+                          </span>
+                          {item.studentName}
+                        </div>
+                      </td>
 
                       <td>{item.rollNo}</td>
 
@@ -519,7 +578,7 @@ function ResultManagement() {
                 key={student.id}
                 style={{
                   marginBottom: "25px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid var(--border)",
                   borderRadius: "10px",
                   overflow: "hidden",
                 }}
@@ -527,7 +586,7 @@ function ResultManagement() {
                 <div
                   style={{
                     padding: "18px",
-                    background: "#f3f4f6",
+                    background: "var(--input-bg)",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -535,17 +594,22 @@ function ResultManagement() {
                     flexWrap: "wrap",
                   }}
                 >
-                  <div>
-                    <h3>{student.name}</h3>
+                  <div className="name-cell">
+                    <span className="avatar">
+                      {getInitials(student.name)}
+                    </span>
+                    <div>
+                      <h3>{student.name}</h3>
 
-                    <p
-                      style={{
-                        marginTop: "5px",
-                        color: "#6b7280",
-                      }}
-                    >
-                      Roll Number: {student.rollNo}
-                    </p>
+                      <p
+                        style={{
+                          marginTop: "5px",
+                          color: "var(--muted)",
+                        }}
+                      >
+                        Roll Number: {student.rollNo}
+                      </p>
+                    </div>
                   </div>
 
                   <div
@@ -568,6 +632,16 @@ function ResultManagement() {
                     >
                       {status}
                     </span>
+
+                    <button
+                      type="button"
+                      className="edit-btn"
+                      onClick={() =>
+                        setPrintingStudent(student)
+                      }
+                    >
+                      Print Card
+                    </button>
                   </div>
                 </div>
 
@@ -656,6 +730,87 @@ function ResultManagement() {
             );
           })}
         </section>
+      )}
+
+      {printingStudent && (
+        <div className="print-card-overlay">
+          <div className="print-card">
+            <div className="print-card-header">
+              <h2>Student Result Card</h2>
+              <p>Official academic report</p>
+            </div>
+
+            <div className="print-card-info">
+              <div>
+                <span>Student Name</span>
+                <strong>{printingStudent.name}</strong>
+              </div>
+              <div>
+                <span>Roll Number</span>
+                <strong>{printingStudent.rollNo}</strong>
+              </div>
+            </div>
+
+            <table className="print-card-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Subject</th>
+                  <th>Total Marks</th>
+                  <th>Obtained Marks</th>
+                  <th>Percentage</th>
+                  <th>Grade</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {printingStudent.subjects.map((subject, index) => {
+                  const percentage = calculatePercentage(
+                    subject.obtainedMarks,
+                    subject.totalMarks
+                  );
+
+                  return (
+                    <tr key={subject.id}>
+                      <td>{index + 1}</td>
+                      <td>{subject.subject}</td>
+                      <td>{subject.totalMarks}</td>
+                      <td>{subject.obtainedMarks}</td>
+                      <td>{percentage}%</td>
+                      <td>{getGrade(percentage)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+
+              <tfoot>
+                <tr>
+                  <th colSpan="2">Overall Result</th>
+                  <th>{printingStudent.totalMarks}</th>
+                  <th>{printingStudent.obtainedMarks}</th>
+                  <th>{printingStudent.percentage}%</th>
+                  <th>
+                    {getGrade(printingStudent.percentage)}
+                  </th>
+                </tr>
+              </tfoot>
+            </table>
+
+            <div className="print-card-footer">
+              <span>
+                Status:{" "}
+                {getStatus(printingStudent.percentage)}
+              </span>
+              <button
+                type="button"
+                className="cancel-btn no-print"
+                onClick={() => setPrintingStudent(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

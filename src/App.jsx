@@ -1,10 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
+import Dashboard from "./components/Dashboard";
 import StudentManagement from "./components/StudentManagement";
 import ResultManagement from "./components/ResultManagement";
 
 function App() {
-  const [activePage, setActivePage] = useState("students");
+  const [activePage, setActivePage] = useState("dashboard");
+
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
   return (
     <div className="app">
@@ -15,38 +29,56 @@ function App() {
 
       <nav className="navbar">
         <div className="nav-container">
-          <button
-            className={
-              activePage === "students"
-                ? "nav-btn active"
-                : "nav-btn"
-            }
-            onClick={() => setActivePage("students")}
-          >
-            Students
-          </button>
+          <div className="nav-links">
+            <button
+              className={
+                activePage === "dashboard"
+                  ? "nav-btn active"
+                  : "nav-btn"
+              }
+              onClick={() => setActivePage("dashboard")}
+            >
+              Dashboard
+            </button>
+
+            <button
+              className={
+                activePage === "students"
+                  ? "nav-btn active"
+                  : "nav-btn"
+              }
+              onClick={() => setActivePage("students")}
+            >
+              Students
+            </button>
+
+            <button
+              className={
+                activePage === "results"
+                  ? "nav-btn active"
+                  : "nav-btn"
+              }
+              onClick={() => setActivePage("results")}
+            >
+              Results
+            </button>
+          </div>
 
           <button
-            className={
-              activePage === "results"
-                ? "nav-btn active"
-                : "nav-btn"
-            }
-            onClick={() => setActivePage("results")}
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode"
           >
-            Results
+            {theme === "light" ? "🌙" : "☀️"}
           </button>
         </div>
       </nav>
 
       <main className="container">
-        {activePage === "students" && (
-          <StudentManagement />
-        )}
-
-        {activePage === "results" && (
-          <ResultManagement />
-        )}
+        {activePage === "dashboard" && <Dashboard />}
+        {activePage === "students" && <StudentManagement />}
+        {activePage === "results" && <ResultManagement />}
       </main>
     </div>
   );

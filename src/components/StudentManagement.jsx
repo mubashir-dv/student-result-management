@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 
+function getInitials(name) {
+  if (!name) return "?";
+  return name.trim().charAt(0).toUpperCase();
+}
+
 function StudentManagement() {
   const [student, setStudent] = useState({
     name: "",
@@ -16,6 +21,7 @@ function StudentManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [viewingStudent, setViewingStudent] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     localStorage.setItem("students", JSON.stringify(students));
@@ -26,18 +32,61 @@ function StudentManagement() {
       ...student,
       [e.target.name]: e.target.value,
     });
+
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: "" });
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!student.name.trim()) {
+      newErrors.name = "Student name is required.";
+    }
+
+    if (!student.rollNo.trim()) {
+      newErrors.rollNo = "Roll number is required.";
+    } else {
+      const duplicateRoll = students.some(
+        (item) =>
+          item.rollNo.trim().toLowerCase() ===
+            student.rollNo.trim().toLowerCase() &&
+          item.id !== editingId
+      );
+
+      if (duplicateRoll) {
+        newErrors.rollNo = "This roll number is already used.";
+      }
+    }
+
+    if (!student.studentClass.trim()) {
+      newErrors.studentClass = "Class is required.";
+    }
+
+    if (!student.studentId.trim()) {
+      newErrors.studentId = "Student ID is required.";
+    } else {
+      const duplicateId = students.some(
+        (item) =>
+          item.studentId.trim().toLowerCase() ===
+            student.studentId.trim().toLowerCase() &&
+          item.id !== editingId
+      );
+
+      if (duplicateId) {
+        newErrors.studentId = "This student ID is already used.";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (
-      !student.name ||
-      !student.rollNo ||
-      !student.studentClass ||
-      !student.studentId
-    ) {
-      alert("Please fill all fields.");
+    if (!validate()) {
       return;
     }
 
@@ -110,6 +159,7 @@ function StudentManagement() {
 
   const cancelEdit = () => {
     setEditingId(null);
+    setErrors({});
 
     setStudent({
       name: "",
@@ -155,7 +205,11 @@ function StudentManagement() {
                 value={student.name}
                 onChange={handleChange}
                 placeholder="Enter student name"
+                className={errors.name ? "input-error" : ""}
               />
+              {errors.name && (
+                <span className="field-error">{errors.name}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -167,7 +221,11 @@ function StudentManagement() {
                 value={student.rollNo}
                 onChange={handleChange}
                 placeholder="Enter roll number"
+                className={errors.rollNo ? "input-error" : ""}
               />
+              {errors.rollNo && (
+                <span className="field-error">{errors.rollNo}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -179,7 +237,13 @@ function StudentManagement() {
                 value={student.studentClass}
                 onChange={handleChange}
                 placeholder="Enter class"
+                className={errors.studentClass ? "input-error" : ""}
               />
+              {errors.studentClass && (
+                <span className="field-error">
+                  {errors.studentClass}
+                </span>
+              )}
             </div>
 
             <div className="form-group">
@@ -191,7 +255,13 @@ function StudentManagement() {
                 value={student.studentId}
                 onChange={handleChange}
                 placeholder="Enter student ID"
+                className={errors.studentId ? "input-error" : ""}
               />
+              {errors.studentId && (
+                <span className="field-error">
+                  {errors.studentId}
+                </span>
+              )}
             </div>
           </div>
 
@@ -262,7 +332,14 @@ function StudentManagement() {
                 {filteredStudents.map((item, index) => (
                   <tr key={item.id}>
                     <td>{index + 1}</td>
-                    <td>{item.name}</td>
+                    <td>
+                      <div className="name-cell">
+                        <span className="avatar">
+                          {getInitials(item.name)}
+                        </span>
+                        {item.name}
+                      </div>
+                    </td>
                     <td>{item.rollNo}</td>
                     <td>{item.studentClass}</td>
                     <td>{item.studentId}</td>
