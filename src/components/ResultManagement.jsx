@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ConfirmDialog from "./ConfirmDialog";
 
 function getInitials(name) {
   if (!name) return "?";
@@ -24,6 +25,7 @@ function ResultManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [errors, setErrors] = useState({});
   const [printingStudent, setPrintingStudent] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   useEffect(() => {
     const savedStudents = localStorage.getItem("students");
@@ -201,6 +203,8 @@ function ResultManagement() {
     if (editingId === id) {
       resetForm();
     }
+
+    setConfirmDeleteId(null);
   };
 
   const calculatePercentage = (obtained, total) => {
@@ -539,7 +543,7 @@ function ResultManagement() {
                         <button
                           className="delete-btn"
                           onClick={() =>
-                            deleteResult(item.id)
+                            setConfirmDeleteId(item.id)
                           }
                         >
                           Delete
@@ -811,6 +815,15 @@ function ResultManagement() {
             </div>
           </div>
         </div>
+      )}
+
+      {confirmDeleteId !== null && (
+        <ConfirmDialog
+          title="Delete Result"
+          message="Are you sure you want to delete this result? This action cannot be undone."
+          onConfirm={() => deleteResult(confirmDeleteId)}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
       )}
     </>
   );

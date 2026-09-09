@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ConfirmDialog from "./ConfirmDialog";
 
 function getInitials(name) {
   if (!name) return "?";
@@ -22,6 +23,7 @@ function StudentManagement() {
   const [editingId, setEditingId] = useState(null);
   const [viewingStudent, setViewingStudent] = useState(null);
   const [errors, setErrors] = useState({});
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("students", JSON.stringify(students));
@@ -155,6 +157,8 @@ function StudentManagement() {
     if (viewingStudent?.id === id) {
       setViewingStudent(null);
     }
+
+    setConfirmDeleteId(null);
   };
 
   const cancelEdit = () => {
@@ -366,7 +370,7 @@ function StudentManagement() {
                       <button
                         className="delete-btn"
                         onClick={() =>
-                          deleteStudent(item.id)
+                          setConfirmDeleteId(item.id)
                         }
                       >
                         Delete
@@ -425,6 +429,15 @@ function StudentManagement() {
             </div>
           </div>
         </section>
+      )}
+
+      {confirmDeleteId !== null && (
+        <ConfirmDialog
+          title="Delete Student"
+          message="Are you sure you want to delete this student? This action cannot be undone."
+          onConfirm={() => deleteStudent(confirmDeleteId)}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
       )}
     </>
   );
