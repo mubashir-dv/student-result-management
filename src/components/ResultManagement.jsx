@@ -39,22 +39,6 @@ function ResultManagement() {
     localStorage.setItem("results", JSON.stringify(results));
   }, [results]);
 
-  useEffect(() => {
-    if (printingStudent) {
-      const timer = setTimeout(() => {
-        window.print();
-      }, 100);
-
-      const handleAfterPrint = () => setPrintingStudent(null);
-      window.addEventListener("afterprint", handleAfterPrint);
-
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener("afterprint", handleAfterPrint);
-      };
-    }
-  }, [printingStudent]);
-
   const handleChange = (e) => {
     setResult({
       ...result,
@@ -291,6 +275,8 @@ function ResultManagement() {
         id: student.id,
         name: student.name,
         rollNo: student.rollNo,
+        studentClass: student.studentClass,
+        studentId: student.studentId,
         subjects: studentResults,
         totalMarks,
         obtainedMarks,
@@ -740,8 +726,30 @@ function ResultManagement() {
         <div className="print-card-overlay">
           <div className="print-card">
             <div className="print-card-header">
-              <h2>Student Result Card</h2>
-              <p>Official academic report</p>
+              <div className="print-card-brand">SRMS</div>
+              <h2>Student Result Management System</h2>
+              <p>Official Academic Result Card</p>
+            </div>
+
+            <div className="print-card-title-row">
+              <span
+                className={
+                  getStatus(printingStudent.percentage) === "Pass"
+                    ? "pass-status"
+                    : "fail-status"
+                }
+              >
+                {getStatus(printingStudent.percentage)}
+              </span>
+
+              <span className="print-card-date">
+                Issued:{" "}
+                {new Date().toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
             </div>
 
             <div className="print-card-info">
@@ -752,6 +760,18 @@ function ResultManagement() {
               <div>
                 <span>Roll Number</span>
                 <strong>{printingStudent.rollNo}</strong>
+              </div>
+              <div>
+                <span>Class</span>
+                <strong>
+                  {printingStudent.studentClass || "-"}
+                </strong>
+              </div>
+              <div>
+                <span>Student ID</span>
+                <strong>
+                  {printingStudent.studentId || "-"}
+                </strong>
               </div>
             </div>
 
@@ -800,14 +820,27 @@ function ResultManagement() {
               </tfoot>
             </table>
 
-            <div className="print-card-footer">
-              <span>
-                Status:{" "}
-                {getStatus(printingStudent.percentage)}
-              </span>
+            <div className="print-card-signatures">
+              <div className="signature-line">
+                <span>Class Teacher</span>
+              </div>
+              <div className="signature-line">
+                <span>Principal</span>
+              </div>
+            </div>
+
+            <div className="print-card-footer no-print">
               <button
                 type="button"
-                className="cancel-btn no-print"
+                className="edit-btn"
+                onClick={() => window.print()}
+              >
+                Print / Save as PDF
+              </button>
+
+              <button
+                type="button"
+                className="cancel-btn"
                 onClick={() => setPrintingStudent(null)}
               >
                 Close
