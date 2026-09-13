@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ConfirmDialog from "./ConfirmDialog";
+import { UploadIcon, EmptyBoxIcon } from "../assets/Icons";
 
 function getInitials(name) {
   if (!name) return "?";
@@ -12,6 +13,7 @@ function StudentManagement() {
     rollNo: "",
     studentClass: "",
     studentId: "",
+    photo: "",
   });
 
   const [students, setStudents] = useState(() => {
@@ -38,6 +40,38 @@ function StudentManagement() {
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: "" });
     }
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErrors({ ...errors, photo: "Please select an image file." });
+      return;
+    }
+
+    if (file.size > 1024 * 1024) {
+      setErrors({
+        ...errors,
+        photo: "Image must be smaller than 1MB.",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setStudent((prev) => ({ ...prev, photo: reader.result }));
+      setErrors((prev) => ({ ...prev, photo: "" }));
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const removePhoto = () => {
+    setStudent((prev) => ({ ...prev, photo: "" }));
   };
 
   const validate = () => {
@@ -101,6 +135,27 @@ function StudentManagement() {
         )
       );
 
+      const savedResults = localStorage.getItem("results");
+
+      if (savedResults) {
+        const results = JSON.parse(savedResults);
+
+        const updatedResults = results.map((item) =>
+          item.studentId === editingId
+            ? {
+                ...item,
+                studentName: student.name,
+                rollNo: student.rollNo,
+              }
+            : item
+        );
+
+        localStorage.setItem(
+          "results",
+          JSON.stringify(updatedResults)
+        );
+      }
+
       setEditingId(null);
     } else {
       const newStudent = {
@@ -116,6 +171,7 @@ function StudentManagement() {
       rollNo: "",
       studentClass: "",
       studentId: "",
+      photo: "",
     });
   };
 
@@ -130,6 +186,7 @@ function StudentManagement() {
         rollNo: selectedStudent.rollNo,
         studentClass: selectedStudent.studentClass,
         studentId: selectedStudent.studentId,
+        photo: selectedStudent.photo || "",
       });
 
       setEditingId(id);
@@ -154,6 +211,21 @@ function StudentManagement() {
       students.filter((student) => student.id !== id)
     );
 
+    const savedResults = localStorage.getItem("results");
+
+    if (savedResults) {
+      const results = JSON.parse(savedResults);
+
+      const remainingResults = results.filter(
+        (item) => item.studentId !== id
+      );
+
+      localStorage.setItem(
+        "results",
+        JSON.stringify(remainingResults)
+      );
+    }
+
     if (viewingStudent?.id === id) {
       setViewingStudent(null);
     }
@@ -170,6 +242,7 @@ function StudentManagement() {
       rollNo: "",
       studentClass: "",
       studentId: "",
+      photo: "",
     });
   };
 
@@ -199,6 +272,43 @@ function StudentManagement() {
         </p>
 
         <form onSubmit={handleSubmit}>
+          <div className="photo-upload-row">
+            <div className="photo-preview">
+              {student.photo ? (
+                <img src={student.photo} alt="Preview" />
+              ) : (
+                <span>{getInitials(student.name)}</span>
+              )}
+            </div>
+
+            <div className="photo-upload-actions">
+              <label className="upload-btn">
+                <UploadIcon />
+                {student.photo ? "Change Photo" : "Upload Photo"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  hidden
+                />
+              </label>
+
+              {student.photo && (
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={removePhoto}
+                >
+                  Remove
+                </button>
+              )}
+
+              {errors.photo && (
+                <span className="field-error">{errors.photo}</span>
+              )}
+            </div>
+          </div>
+
           <div className="form-grid">
             <div className="form-group">
               <label>Student Name</label>
@@ -306,6 +416,7 @@ function StudentManagement() {
 
         {students.length === 0 ? (
           <div className="empty-state">
+            <EmptyBoxIcon />
             <p>No students added yet.</p>
             <span>
               Add a student using the form above.
@@ -313,6 +424,7 @@ function StudentManagement() {
           </div>
         ) : filteredStudents.length === 0 ? (
           <div className="empty-state">
+            <EmptyBoxIcon />
             <p>No matching student found.</p>
             <span>
               Try another name or roll number.
@@ -338,9 +450,17 @@ function StudentManagement() {
                     <td>{index + 1}</td>
                     <td>
                       <div className="name-cell">
-                        <span className="avatar">
-                          {getInitials(item.name)}
-                        </span>
+                        {item.photo ? (
+                          <img
+                            src={item.photo}
+                            alt={item.name}
+                            className="avatar avatar-photo"
+                          />
+                        ) : (
+                          <span className="avatar">
+                            {getInitials(item.name)}
+                          </span>
+                        )}
                         {item.name}
                       </div>
                     </td>
@@ -398,6 +518,18 @@ function StudentManagement() {
               ×
             </button>
           </div>
+
+          {viewingStudent.photo ? (
+            <img
+              src={viewingStudent.photo}
+              alt={viewingStudent.name}
+              className="details-photo"
+            />
+          ) : (
+            <div className="details-photo details-photo-fallback">
+              {getInitials(viewingStudent.name)}
+            </div>
+          )}
 
           <div className="details-grid">
             <div>
