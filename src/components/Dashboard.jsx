@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  StudentsIcon,
+  ResultsIcon,
+  PassRateIcon,
+  AverageIcon,
+  EmptyBoxIcon,
+} from "../assets/Icons";
 
 function getInitials(name) {
   if (!name) return "?";
@@ -95,16 +102,25 @@ function Dashboard() {
 
       <div className="stat-cards">
         <div className="stat-card">
+          <span className="stat-icon stat-icon-blue">
+            <StudentsIcon />
+          </span>
           <span className="stat-label">Total Students</span>
           <strong className="stat-value">{students.length}</strong>
         </div>
 
         <div className="stat-card">
+          <span className="stat-icon stat-icon-purple">
+            <ResultsIcon />
+          </span>
           <span className="stat-label">Total Results</span>
           <strong className="stat-value">{results.length}</strong>
         </div>
 
         <div className="stat-card">
+          <span className="stat-icon stat-icon-green">
+            <PassRateIcon />
+          </span>
           <span className="stat-label">Pass Rate</span>
           <strong className="stat-value stat-success">
             {passRate}%
@@ -112,6 +128,9 @@ function Dashboard() {
         </div>
 
         <div className="stat-card">
+          <span className="stat-icon stat-icon-amber">
+            <AverageIcon />
+          </span>
           <span className="stat-label">Average Score</span>
           <strong className="stat-value">{avgPercentage}%</strong>
         </div>
@@ -123,6 +142,7 @@ function Dashboard() {
 
           {gradedStudents.length === 0 ? (
             <div className="empty-state">
+              <EmptyBoxIcon />
               <p>No graded results yet.</p>
               <span>Add results to see the distribution.</span>
             </div>
@@ -149,6 +169,7 @@ function Dashboard() {
 
           {recentStudents.length === 0 ? (
             <div className="empty-state">
+              <EmptyBoxIcon />
               <p>No students added yet.</p>
               <span>Add a student to get started.</span>
             </div>
@@ -156,9 +177,17 @@ function Dashboard() {
             <ul className="mini-list">
               {recentStudents.map((student) => (
                 <li key={student.id} className="mini-list-item">
-                  <span className="avatar">
-                    {getInitials(student.name)}
-                  </span>
+                  {student.photo ? (
+                    <img
+                      src={student.photo}
+                      alt={student.name}
+                      className="avatar avatar-photo"
+                    />
+                  ) : (
+                    <span className="avatar">
+                      {getInitials(student.name)}
+                    </span>
+                  )}
                   <div className="mini-list-info">
                     <strong>{student.name}</strong>
                     <span>
@@ -172,9 +201,17 @@ function Dashboard() {
 
           {topStudent && (
             <div className="top-student-banner">
-              <span className="avatar avatar-accent">
-                {getInitials(topStudent.name)}
-              </span>
+              {topStudent.photo ? (
+                <img
+                  src={topStudent.photo}
+                  alt={topStudent.name}
+                  className="avatar avatar-photo"
+                />
+              ) : (
+                <span className="avatar avatar-accent">
+                  {getInitials(topStudent.name)}
+                </span>
+              )}
               <div>
                 <strong>{topStudent.name}</strong> is the top
                 performer with{" "}
