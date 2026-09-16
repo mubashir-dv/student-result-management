@@ -162,12 +162,14 @@ button {
   margin: auto;
   padding: 11px 20px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
 
 .nav-links {
+  flex-wrap: wrap;
   display: flex;
   gap: 8px;
 }
@@ -476,7 +478,8 @@ button:hover {
 
 .table-container {
   width: 100%;
-  overflow-x: auto;
+  max-height: 520px;
+  overflow: auto;
   border: 1px solid var(--border);
   border-radius: 9px;
 }
@@ -496,6 +499,9 @@ td {
 }
 
 th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: var(--input-bg);
   color: var(--muted);
   font-size: 12px;
@@ -509,10 +515,15 @@ td {
   background: var(--card-bg);
   color: var(--text);
   font-size: 13px;
+  transition: background 0.15s ease;
+}
+
+tbody tr:nth-child(even) td {
+  background: var(--input-bg);
 }
 
 tbody tr:hover td {
-  background: var(--input-bg);
+  background: var(--info-bg);
 }
 
 tbody tr:last-child td {
@@ -520,6 +531,7 @@ tbody tr:last-child td {
 }
 
 tfoot th {
+  position: static;
   background: var(--info-bg);
   color: var(--primary-dark);
 }
@@ -655,6 +667,14 @@ tfoot th {
   vertical-align: middle;
   white-space: nowrap;
   box-shadow: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.view-btn:active,
+.edit-btn:active,
+.delete-btn:active {
+  transform: translateY(0) scale(0.97);
 }
 
 .view-btn {
@@ -663,6 +683,7 @@ tfoot th {
 
 .view-btn:hover {
   background: #15803d;
+  transform: translateY(-1px);
   box-shadow: 0 4px 9px rgba(22, 163, 74, 0.2);
 }
 
@@ -672,6 +693,7 @@ tfoot th {
 
 .edit-btn:hover {
   background: #1d4ed8;
+  transform: translateY(-1px);
   box-shadow: 0 4px 9px rgba(37, 99, 235, 0.2);
 }
 
@@ -681,6 +703,7 @@ tfoot th {
 
 .delete-btn:hover {
   background: #dc2626;
+  transform: translateY(-1px);
   box-shadow: 0 4px 9px rgba(239, 68, 68, 0.2);
 }
 
@@ -1122,6 +1145,39 @@ tfoot th {
   .delete-btn {
     margin-bottom: 4px;
   }
+
+  .photo-upload-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .print-card {
+    padding: 20px;
+  }
+
+  .print-card-body-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .print-card-info {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .print-card-signatures {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .print-card-footer {
+    flex-direction: column;
+  }
+
+  .print-card-footer button {
+    width: 100%;
+  }
 }
 
 /* Small Mobile */
@@ -1407,4 +1463,46 @@ tfoot th {
   display: flex;
   justify-content: center;
   gap: 10px;
+}
+
+/* Tab switch fade-in */
+
+.page-fade {
+  animation: pageFadeIn 0.25s ease;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Delete confirmation pop-in */
+
+.confirm-box {
+  animation: confirmPopIn 0.18s ease;
+}
+
+@keyframes confirmPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Empty state action button */
+
+.empty-state-btn {
+  margin-top: 16px;
+  padding: 9px 20px;
+  font-size: 13px;
 }

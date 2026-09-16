@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ConfirmDialog from "./ConfirmDialog";
+import { EmptyBoxIcon } from "../assets/Icons";
 
 function getInitials(name) {
   if (!name) return "?";
@@ -276,6 +277,7 @@ function ResultManagement() {
         name: student.name,
         rollNo: student.rollNo,
         studentClass: student.studentClass,
+        photo: student.photo || "",
         studentId: student.studentId,
         subjects: studentResults,
         totalMarks,
@@ -432,14 +434,25 @@ function ResultManagement() {
 
         {results.length === 0 ? (
           <div className="empty-state">
+            <EmptyBoxIcon />
             <p>No results added yet.</p>
 
             <span>
               Add a result using the form above.
             </span>
+            <button
+              type="button"
+              className="empty-state-btn"
+              onClick={() =>
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }
+            >
+              Add Result
+            </button>
           </div>
         ) : filteredResults.length === 0 ? (
           <div className="empty-state">
+            <EmptyBoxIcon />
             <p>No matching result found.</p>
 
             <span>
@@ -475,15 +488,27 @@ function ResultManagement() {
                   const grade = getGrade(percentage);
                   const status = getStatus(percentage);
 
+                  const resultStudent = students.find(
+                    (s) => s.id === item.studentId
+                  );
+
                   return (
                     <tr key={item.id}>
                       <td>{index + 1}</td>
 
                       <td>
                         <div className="name-cell">
-                          <span className="avatar">
-                            {getInitials(item.studentName)}
-                          </span>
+                          {resultStudent?.photo ? (
+                            <img
+                              src={resultStudent.photo}
+                              alt={item.studentName}
+                              className="avatar avatar-photo"
+                            />
+                          ) : (
+                            <span className="avatar">
+                              {getInitials(item.studentName)}
+                            </span>
+                          )}
                           {item.studentName}
                         </div>
                       </td>
@@ -585,9 +610,17 @@ function ResultManagement() {
                   }}
                 >
                   <div className="name-cell">
-                    <span className="avatar">
-                      {getInitials(student.name)}
-                    </span>
+                    {student.photo ? (
+                      <img
+                        src={student.photo}
+                        alt={student.name}
+                        className="avatar avatar-photo"
+                      />
+                    ) : (
+                      <span className="avatar">
+                        {getInitials(student.name)}
+                      </span>
+                    )}
                     <div>
                       <h3>{student.name}</h3>
 
@@ -752,26 +785,40 @@ function ResultManagement() {
               </span>
             </div>
 
-            <div className="print-card-info">
-              <div>
-                <span>Student Name</span>
-                <strong>{printingStudent.name}</strong>
-              </div>
-              <div>
-                <span>Roll Number</span>
-                <strong>{printingStudent.rollNo}</strong>
-              </div>
-              <div>
-                <span>Class</span>
-                <strong>
-                  {printingStudent.studentClass || "-"}
-                </strong>
-              </div>
-              <div>
-                <span>Student ID</span>
-                <strong>
-                  {printingStudent.studentId || "-"}
-                </strong>
+            <div className="print-card-body-row">
+              {printingStudent.photo ? (
+                <img
+                  src={printingStudent.photo}
+                  alt={printingStudent.name}
+                  className="print-card-photo"
+                />
+              ) : (
+                <div className="print-card-photo print-card-photo-fallback">
+                  {getInitials(printingStudent.name)}
+                </div>
+              )}
+
+              <div className="print-card-info">
+                <div>
+                  <span>Student Name</span>
+                  <strong>{printingStudent.name}</strong>
+                </div>
+                <div>
+                  <span>Roll Number</span>
+                  <strong>{printingStudent.rollNo}</strong>
+                </div>
+                <div>
+                  <span>Class</span>
+                  <strong>
+                    {printingStudent.studentClass || "-"}
+                  </strong>
+                </div>
+                <div>
+                  <span>Student ID</span>
+                  <strong>
+                    {printingStudent.studentId || "-"}
+                  </strong>
+                </div>
               </div>
             </div>
 

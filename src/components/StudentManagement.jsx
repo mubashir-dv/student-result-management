@@ -421,6 +421,15 @@ function StudentManagement() {
             <span>
               Add a student using the form above.
             </span>
+            <button
+              type="button"
+              className="empty-state-btn"
+              onClick={() =>
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }
+            >
+              Add Student
+            </button>
           </div>
         ) : filteredStudents.length === 0 ? (
           <div className="empty-state">

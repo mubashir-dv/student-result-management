@@ -3,6 +3,8 @@ import "./App.css";
 import Dashboard from "./components/Dashboard";
 import StudentManagement from "./components/StudentManagement";
 import ResultManagement from "./components/ResultManagement";
+import StudentPortal from "./components/StudentPortal";
+import { LogoIcon } from "./assets/Icons";
 
 function App() {
   const [activePage, setActivePage] = useState("dashboard");
@@ -23,7 +25,10 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Student Result Management System</h1>
+        <div className="header-brand">
+          <LogoIcon size={26} />
+          <h1>Student Result Management System</h1>
+        </div>
         <p>Manage student records and academic results</p>
       </header>
 
@@ -62,6 +67,17 @@ function App() {
             >
               Results
             </button>
+
+            <button
+              className={
+                activePage === "portal"
+                  ? "nav-btn active"
+                  : "nav-btn"
+              }
+              onClick={() => setActivePage("portal")}
+            >
+              Check Result
+            </button>
           </div>
 
           <button
@@ -76,9 +92,12 @@ function App() {
       </nav>
 
       <main className="container">
-        {activePage === "dashboard" && <Dashboard />}
-        {activePage === "students" && <StudentManagement />}
-        {activePage === "results" && <ResultManagement />}
+        <div key={activePage} className="page-fade">
+          {activePage === "dashboard" && <Dashboard />}
+          {activePage === "students" && <StudentManagement />}
+          {activePage === "results" && <ResultManagement />}
+          {activePage === "portal" && <StudentPortal />}
+        </div>
       </main>
     </div>
   );
