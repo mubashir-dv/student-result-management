@@ -66,7 +66,7 @@ function Dashboard() {
   );
 
   const passCount = gradedStudents.filter(
-    (s) => s.percentage >= 40
+    (s) => s.percentage >= 50
   ).length;
 
   const passRate =

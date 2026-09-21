@@ -70,6 +70,8 @@ button {
     var(--bg);
 }
 
+/* Header */
+
 .header {
   position: relative;
   overflow: hidden;
@@ -139,6 +141,8 @@ button {
   font-size: 15px;
 }
 
+/* Navbar */
+
 .navbar {
   position: sticky;
   top: 0;
@@ -154,6 +158,7 @@ button {
 }
 
 .nav-container {
+  position: relative;
   max-width: 1150px;
   margin: auto;
   padding: 11px 20px;
@@ -229,11 +234,15 @@ button {
   box-shadow: none;
 }
 
+/* Main */
+
 .container {
   max-width: 1150px;
   margin: 35px auto;
   padding: 0 20px 50px;
 }
+
+/* Common Cards */
 
 .form-card,
 .students-section,
@@ -277,6 +286,8 @@ button {
   color: var(--muted);
   font-size: 14px;
 }
+
+/* Forms */
 
 .form-grid {
   display: grid;
@@ -370,6 +381,8 @@ button {
   color: var(--text);
 }
 
+/* Main Buttons */
+
 button {
   padding: 11px 19px;
   border-radius: 8px;
@@ -389,6 +402,8 @@ button:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(37, 99, 235, 0.22);
 }
+
+/* Sections */
 
 .students-section {
   margin-top: 28px;
@@ -422,9 +437,13 @@ button:hover {
   color: #93c5fd;
 }
 
+/* Search */
+
 .search-box {
   margin-bottom: 20px;
 }
+
+/* Empty */
 
 .empty-state {
   padding: 45px 20px;
@@ -455,6 +474,8 @@ button:hover {
   color: var(--muted);
   font-size: 14px;
 }
+
+/* Tables */
 
 .table-container {
   width: 100%;
@@ -520,6 +541,8 @@ tfoot th {
   color: #93c5fd;
 }
 
+/* Student name cell with avatar */
+
 .name-cell {
   display: flex;
   align-items: center;
@@ -548,6 +571,8 @@ tfoot th {
 .avatar-photo {
   object-fit: cover;
 }
+
+/* Photo upload (Add Student form) */
 
 .photo-upload-row {
   display: flex;
@@ -604,6 +629,8 @@ tfoot th {
   background: var(--border);
 }
 
+/* Student details photo */
+
 .details-photo {
   display: flex;
   align-items: center;
@@ -622,6 +649,8 @@ tfoot th {
   font-size: 26px;
   font-weight: 700;
 }
+
+/* Action Buttons */
 
 .view-btn,
 .edit-btn,
@@ -693,6 +722,8 @@ tfoot th {
 .close-btn:hover {
   background: #475569;
 }
+
+/* Status & Grade */
 
 .pass-status,
 .fail-status,
@@ -784,6 +815,8 @@ tfoot th {
   color: var(--text);
   font-size: 16px;
 }
+
+/* Dashboard */
 
 .dashboard {
   padding: 30px;
@@ -994,6 +1027,8 @@ tfoot th {
   font-size: 13px;
 }
 
+/* Result Summary */
+
 .students-section > div[style] {
   background: var(--card-bg);
   box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
@@ -1002,6 +1037,8 @@ tfoot th {
 .result-form + .students-section {
   margin-top: 28px;
 }
+
+/* Tablet */
 
 @media (max-width: 800px) {
   .header {
@@ -1033,6 +1070,8 @@ tfoot th {
     padding: 24px;
   }
 }
+
+/* Mobile */
 
 @media (max-width: 600px) {
   .header {
@@ -1142,6 +1181,8 @@ tfoot th {
   }
 }
 
+/* Small Mobile */
+
 @media (max-width: 400px) {
   .header h1 {
     font-size: 20px;
@@ -1177,6 +1218,8 @@ tfoot th {
     grid-template-columns: 1fr;
   }
 }
+
+/* Printable result card */
 
 .print-card-overlay {
   position: fixed;
@@ -1382,6 +1425,8 @@ tfoot th {
   }
 }
 
+/* Delete confirmation dialog */
+
 .confirm-overlay {
   position: fixed;
   inset: 0;
@@ -1421,6 +1466,8 @@ tfoot th {
   gap: 10px;
 }
 
+/* Tab switch fade-in */
+
 .page-fade {
   animation: pageFadeIn 0.25s ease;
 }
@@ -1436,6 +1483,8 @@ tfoot th {
   }
 }
 
+/* Delete confirmation pop-in */
+
 .confirm-box {
   animation: confirmPopIn 0.18s ease;
 }
@@ -1450,6 +1499,8 @@ tfoot th {
     transform: scale(1);
   }
 }
+
+/* Empty state action button */
 
 .empty-state-btn {
   margin-top: 16px;

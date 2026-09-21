@@ -23,7 +23,7 @@ function getGrade(percentage) {
 }
 
 function getStatus(percentage) {
-  return Number(percentage) >= 40 ? "Pass" : "Fail";
+  return Number(percentage) >= 50 ? "Pass" : "Fail";
 }
 
 function StudentPortal() {

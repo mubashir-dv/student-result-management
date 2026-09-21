@@ -13,7 +13,7 @@ function StudentManagement() {
     rollNo: "",
     studentClass: "",
     studentId: "",
-    photo: "",
+    photo: ""
   });
 
   const [students, setStudents] = useState(() => {

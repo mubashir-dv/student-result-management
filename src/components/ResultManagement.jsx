@@ -201,7 +201,7 @@ function ResultManagement() {
   };
 
   const getStatus = (percentage) => {
-    return Number(percentage) >= 40
+    return Number(percentage) >= 50
       ? "Pass"
       : "Fail";
   };
